@@ -1,0 +1,1405 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+
+\title{Note for Project on Iterated Forcing and Solovay Model}
+\author{Yipu Li}
+\date{November 2024}
+
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{pgffor}
+\usepackage{enumitem}
+\usepackage{ifthen}
+\usepackage{stmaryrd}
+\usepackage{xcolor}
+
+
+\newtheorem{definition}{Definition}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\newtheorem{innercustomthm}{Theorem}
+\newenvironment{customthm}[1]
+  {\renewcommand\theinnercustomthm{#1}\innercustomthm}
+  {\endinnercustomthm}
+\newtheorem{innerexercise}{Exercise}
+\newenvironment{exercise}[1]
+  {\renewcommand\theinnerexercise{#1}\innerexercise}
+  {\endinnerexercise}
+
+\newcommand{\cA}{\mathcal{A}}
+\newcommand{\cB}{\mathcal{B}}
+\newcommand{\bbP}{\mathbb{P}}
+\newcommand{\bbQ}{\mathbb{Q}}
+
+
+\usepackage{hyperref}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{Definitions and Notations}
+
+In this report, we summarize the study on iterated forcing and Solovay model, mainly based on the book of Kunen and Jech we start with some basic definitions. In the following, Kunen stands for the book \cite{Kunen}, Jech for \cite{Jech} and Kanamori for \cite{Kanamori}.
+
+A forcing poset stands for a partial order $\bbP = (P,\leq,1)$ with a greatest element $1$. If $p\leq q$, we say $p$ is a stronger condition than $q$. We say $p,q$ are compatible if there is a common element below them, $p,q$ are incompatible (writen $p\bot q$) if they are not compatible. A forcing poset is atomless if for every element $p$, there is $q,r\leq p$ s.t. $q\bot r$ (such elements are called atoms). Finally, a poset is separative if for any $p\not\leq q$, there is $r\leq q$ s.t. $p\bot r$.
+
+Throughout the report we try to stick with the countable transitive model approach to forcing unless otherwise mentioned. A ctm is short for a countable transitive model.
+
+\begin{definition}[Complete Sub-poset, Definition III.3.63 in Kunen]
+    For a poset $\bbQ\subseteq \bbP$, we say $\bbQ$ is a complete sub-poset, denoted $\bbQ\subseteq_{c}\bbP$, if 
+    \begin{enumerate}
+        \item For all $n\in \omega$ and $q_1\dots q_n\in \bbQ$, if there is $p\in \bbP$ s.t. $p\leq q_i$ for all $1\leq i\leq n$, then there is $q\in \bbQ$ s.t. $q\leq q_i$ for all $1\leq i\leq n$.
+        \item For each maximal antichain $A$ in $\bbQ$, it is still a maximal antichain in $\bbP$.
+    \end{enumerate}
+\end{definition}
+
+\begin{definition}[Complete Embedding, Definition III.3.65 in Kunen]
+    For two posets $\bbQ$ and $\bbP$, $i:\bbQ\to \bbP$ is a complete embedding iff:
+    \begin{enumerate}
+        \item $i(1_\bbQ) = 1_\bbP$
+        \item If $q_1\leq q_2$ then $i(q_1)\leq i(q_2)$
+        \item $q_1\bot q_2$ iff $i(q_1)\bot i(q_2)$
+        \item If $A$ is a maximal antichain in $\bbQ$, then $i[A]$ is maximal antichain in $\bbP$.
+    \end{enumerate}
+    Furthermore, if $i[\bbQ]$ is in addition dense in $\bbP$, we say $i$ is a dense embedding.
+\end{definition}
+
+Notice that this definition actually does not require injectivity, but that is unimportant. As we will show in the next section, if $\mathbb{P}$ completely embeds into $\mathbb{Q}$, $\bbQ$ is in a sense richer than $\bbP$ as a forcing notion. And if the embedding is dense, then they are equivalent forcing notions.
+
+\section{Embedding of Posets and Comparation of Forcing Posets}
+
+\begin{lemma}[Lemma IV.4.2 in Kunen]\label{lem:1}
+    For a ctm $M$ and forcing posets $\bbP,\bbQ\in M$, if $i:\bbQ\to \bbP$ is a complete embedding that is in $M$, then if $G\subseteq \bbP$ is $\bbP$ generic over $M$, $i^{-1}[G]$ is $\bbQ$ generic over $M$.
+\end{lemma}
+
+\begin{proof}
+    First, we show that $i^{-1}[G]$ intersects every dense set in $M$. If $D\in M$ is a dense set in $\bbQ$, then use Zorn's Lemma to get a maximal set $A$ satisfying: $A$ is an antichain and it is a subset of $D$.
+
+    Then $A$ is a maximal antichain of $\bbQ$. By assumption, $i[A]$ is a maximal antichain for $\bbP$, and the set $i[A]\downarrow = \{p\in \bbP\mid p\leq a\text{ for some } a\in A\}$ is dense in $\bbP$ and is in $M$. Since $G$ is generic, $G\cap i[A]\downarrow$ is not empty and hence $G\cap i[A]$ is not empty as $G$ is upward closed. Hence $i^{-1}[G]\cap A$ is not empty, which means $i^{-1}[G]$ intersects $D$ as $A\subseteq D$. Consequently, $i^{-1}[G]$ intersects every dense set in $M$.
+
+    It is easy to see that $i^{-1}[G]$ is upward closed and contains $1_{\bbQ}$. For $q_1,q_2\in i^{-1}[G]$, consider the set $$D = \{q\in \bbQ\mid q\bot q_1\text{ or }q\bot q_2\text{ or }q\leq q_1,q_2\}$$
+
+    We show that it is dense, for $r\in \bbQ$, if $r\not \bot q_1$, then there is $r'\leq r,q_1$, if $r'\bot q_2$, we are done; otherwise there is $r''\leq r',q_2$, which is an element under $r,q_1,q_2$.
+    
+    Hence since $i^{-1}[G]$ intersects $D$, there is $r\in i^{-1}[G]$, $r\leq q_1,q_2$.
+\end{proof}
+
+
+Let $H$ be $i^{-1}[G]$, then $H$ is contained in $M[G]$. By the minimality of $M[H]$, $M[H]\subseteq M[G]$. But there is a direct translation of $\mathbb{P}$-names into $\bbQ$-names that proved the subset relation between generic extensions.
+
+Let $i_*: V^\bbQ\to V^\bbP$ be recursively defined as:
+
+$$i_*(\tau) = \{(i_*(\sigma),i(q))\mid (\sigma,q)\in \tau\}$$
+
+Then it follows by induction that $val(i_*(\tau),G) = val(\tau,H)$.
+
+If $i:\bbQ\to \bbP$ is a dense embedding, $G$ is $ \bbP$ generic over $M$, then $H = i^{-1}[G]$ is forcingly equivalent to $G$.
+
+\begin{lemma}[Lemma IV.4.7 in Kunen]
+    For a ctm $M$ with $i,\bbQ,\bbP\in M$, if $i:\bbQ\to \bbP$ is a dense embedding, then 
+
+    \begin{enumerate}
+        \item If $H\subseteq \bbQ$ is $\bbQ$ generic over $M$ and $G = i[H]\uparrow = \{p\in \bbP\mid \text{ there is } p'\in i[H] \text{ s.t. }p'\leq p\}$, then $G$ is $\bbP$ generic over $M$ and $i^{-1}[G] = H$.
+        \item If $G\subseteq \bbP$ is $\bbP$ generic over $M$ and $H = i^{-1}[G]$, then $H$ is $\bbQ$ generic over $M$ and $G = i[H]\uparrow $.
+        \item In (1) and (2), $M[H] = M[G]$.
+        \item For $q\in \bbQ$ and $\tau_1\dots \tau_n\in M^\bbQ$, $$q\Vdash_\bbQ \varphi(\tau_1\dots \tau_n) \text{ iff } i(q)\Vdash_\bbP\varphi(i_*(\tau_1) \dots i_*(\tau_n))$$
+    \end{enumerate}
+\end{lemma}
+
+\begin{proof}
+    (1) $G$ of course contains $1_\bbP$ and is upward closed. For $p_1,p_2\in G$, there is $q_1,q_2\in H$ s.t. $i[q_1]\leq p_1$, $i[q_2]\leq p_2$. Then there is $q_3\leq q_1,q_2$ and thus $i(q_3)\leq p_1,p_2$. Hence $G$ is a filter. 
+
+    To show that $G$ is $\bbP$ generic over $M$, we first show that is intersects every dense set in $M$ that is downward closed.
+
+    For each dense set $D\in M$, $D\subseteq \bbP$ s.t. $D$ is downward closed, $i^{-1}[D]$ is dense in $\bbQ$ as for each $q\in \bbQ$, there is $d\in D$, $d\leq i(q)$. Since $i$ is a dense embedding, there is $q'$ s.t. $i(q')\leq d\leq i(q)$, hence $i(q')\in i[\bbQ]\cap D$ and $i^{-1}[D]$ is dense in $\bbQ$. Hence $H$ intersects with $i^{-1}[D]$ and thus $G$ intersects with $D$. 
+
+    Now for arbitrary dense set $D\in M$, since $G$ intersects with its downward closure and $G$ is upward closed, $G$ intersects with $D$.
+
+    Finally, $H \subseteq i^{-1}[G]$ is easy, since both are $\bbQ$ generic for M by Lemma \ref{lem:1}, for each $q\in i^{-1}[G]$, $$D = \{q'\in \bbQ\mid q'\leq q\text{ or }q'\bot q\}$$ is dense in $\bbQ$ and is in $M$. Hence $H$ intersects $D$ and thus $q\in H$. Hence $i^{-1}[G]$
+
+    (2) 
+
+    (3) This is true by twice application of minimality of $M[G]$.
+
+    (4) Say $q \Vdash_\bbQ \varphi(\tau_1\dots \tau_n)$, for each $\bbQ$ generic filter $H$ s.t. $i(q)\in H$, $q\in G$. $M[G] \models \varphi(\tau_1\dots \tau_n)$. Since $val(\tau,G) = val(i_*(\tau),H)$ and $M[G] = M[H]$, $M[H]\models \varphi(i_*(\tau_1)\dots i_*(\tau_n))$. 
+
+    Hence $i(q) \Vdash_\bbP \varphi(\tau_1\dots \tau_n)$.
+\end{proof}
+
+The following theorem shows that under forcing equivalent in the sense of the above lemma, the Cohen forcing $Fn(\omega,\omega)$ is only countable atomless forcing notion.
+
+\begin{proposition}[Exercise III.3.69, III.3.70 in Kunen]\label{prop:canonical-countable-atomless-forcing}
+    For each countable  atomless forcing poset $\mathbb{P}$, $\mathbb{T} = \omega^{<\omega}$ densely enbeds into it.
+\end{proposition}
+
+\begin{proof}
+    Enumerate $\bbP $ as $\{p_n\mid n\in \omega\}$. We recursively define an embedding $\pi:\mathbb{T}\to \bbP$.
+
+    Suppose $\pi(t)$ has been defined for $len(t)\leq n$, we find a maximal antichain $A$ below $\pi(t)$ in $\bbP$. Such antichain must be countable as the poset is atomless. We map $t\widehat{\phantom{x}}n$ to the $n$ th element in $A$. Moreover, we make sure in the induction step that there is $t$ of lenth $n+1$ s.t. $\pi(t)\leq p_{n+1}$. Then $\pi$ would be a dense embedding.
+\end{proof}
+
+\section{General Theory of Iterated Forcing}
+
+Say we iteratively force over $\bbP\in M$ to get $M[G]$ in $M$ and then force over $\bbQ\in M[G]$ to get $M[G][H]$ in $M[G]$. 
+We want to discuss the iterated forcing case where the second step forcing poset $\bbQ\in M[G]$ is not necessarily in $M$. But what is always true is that $\bbQ, \leq_\bbQ,1$ will always have a name $\check{\bbQ},\check{\leq_\bbQ}, \check{1}$ in the forcing poset. We show that two step iterated forcing is equivalent to forcing over the poset $\mathbb{P}*\dot{\mathbb{Q}}$ in the model $M$ in one step. Here $$\mathbb{P}*\dot{\mathbb{Q}} = \{(p,\dot{q})\in \bbP\times dom(\check{\bbQ})\mid p\Vdash \check{q}\in \check{\bbQ}\} $$
+
+$(p_1,\check{q_1})\leq (p_2,\check{q_2})$ iff $p_1\leq_\bbP p_2$ and $p_1\Vdash \check{q_1}\check{\leq_\bbQ} \check{q_2}$.
+
+\begin{lemma}[Lemma V.3.4 in Kunen]
+    For a forcing poset $\mathbb{P}$, a name for a forcing poset $\dot{\mathbb{Q}}$, $p_1,p_2\in \mathbb{P}$ and $\dot{q_1},\dot{q_2}\in \dot{\mathbb{Q}}$, the following are true:
+
+    \begin{enumerate}
+        \item $\mathbb{P}*\dot{\mathbb{Q}}$ is a pre order.
+        \item $p_1\bot p_2$ iff $(p_1,\dot{1})\bot (p_2, \dot{q_2})$.
+        \item $i$ is a complete embedding.
+    \end{enumerate}
+\end{lemma}
+
+\begin{proof}
+
+    The second bullet point: The left to right direction is easy. For the right to left, if $r\leq p_1,p_2$, then $(r,\dot{q_1})\leq (p_1,\dot{1}), (p_2,\dot{q_2})$.
+
+    The final bullet point: It is easy to check that $p_1\leq p_2$ entails $i(p_1)\leq i(p_2)$ and $ i(1_\mathbb{P}) = 1_{\mathbb{P}*\dot{\mathbb{Q}}}$. That $p_1\bot p_2$ iff $i(p_1)\bot i(p_2)$ follows from the second bullet point.
+
+    If $A\subseteq \mathbb{P}$ is a maximal antichain in $\mathbb{P}$, then $i[A]$ is maximal as suppose $(p,\dot{q})\bot i[A]$, then $p\bot p'$ for all $p'\in A$ by the second bullet point. This is a contradiction to maximality.
+\end{proof}
+
+The poset $\mathbb{P}*\dot{\mathbb{Q}}$ is not necessarily anti-symmetric, but it should not matter as we can always assume we are working with the anti-symmetric equivalent to it.
+
+Now regarding product of filters, 
+for $G\subseteq \bbP$ and $H\subseteq \dot{\bbQ}_G$, let $G * H = \{(p,\dot{q})\in \bbP * \dot{\bbQ}\mid p\in G\land \dot{q}_G\in H\}$. This computation is done in $V$.
+
+\begin{theorem}[Theorem V.3.6 in Kunen]\label{thm:two-step-iteration}
+    Let $K$ be $\mathbb{P}*\dot{\mathbb{Q}}$ generic over $M$. Let $G = i^{-1}[K]$ and $H = \{\dot{q_G}\mid \dot{q}\in dom(\dot{\bbQ})\land \exists p(p,\dot{q})\in K\}$. 
+
+    Then $G$ is $\bbP$ generic over $M$ and $H$ is $\dot{\bbQ}_G$ generic over $M[G]$. $K = G * H$ and $M[K] = M[G][H]$.
+\end{theorem}
+
+Remark: $H$ is very different from $G$ in terms of how they are constructed from $K$. $H$ can be viewed as the projection of $K$ along $\dot{\bbQ}$, and then evaluated pointwise.
+
+\begin{proof}
+    That $G$ is $\bbP$ generic over $M$ follows from Lemma \ref{lem:1} and that $i$ is a complete embedding in $M$.
+
+    To show $H$ is a filter, that $H$ contains $1$ and every element pair in $H$ is consistent is easy. Now for $\dot{q_1}_G\in H$ and $\dot{q_1}_G\dot{\leq}_G\dot{q_2}_G$, then there is $p_1\in G$ s.t. $p\Vdash \dot{q_1}\dot{\leq}\dot{q_2}$ and $p'$ s.t. $(p_2,\dot{q_1})\in K$. Then there is $(p_3,\dot{q_3})\leq i[p], (p_2,\dot{q_1})$, which means that $p_3\Vdash \dot{q_3}\dot{\leq}\dot{q_1}\land\dot{q_1}\dot{\leq}\dot{q_2}$. Hence $(p_3,\dot{q_3})\leq (p_3,\dot{q_2})$ and hence $(p_3,\dot{q_2})\in K$, which means that $\dot{q_2}_G\in H$.
+
+    To show $H$ is $\dot{Q}_G$ generic over $M[G]$, fix $D\in M[G]$ s.t. $D$ is dense in $\dot{Q}_G$. $D$ has a $\bbP$ name $\dot{D}$ and there is $p^*\in G$ s.t. $$p^*\Vdash \forall q\in \bbQ\exists q'\in \dot{D}q'\leq q$$
+
+    Consider the following set in $M$: $$E = \{(p,\dot{q})\mid p^*\Vdash \dot{q}\in \dot{D}, p\leq p^*\}\cup \{(p, \dot{q})\mid p\bot p^*\}$$
+
+    It is dense in $\bbP*\dot{\bbQ}$ as for $(p,\dot{q})$, may assume $p\leq p^*$ and $p^*\Vdash \exists q'\in \dot{D},q'\leq \dot{q}$. By Maximality principle there is $\dot{q'}$ s.t. $p^*\Vdash \dot{q'}\in \dot{D}\land \dot{q'}\leq \dot{q}$ and hence $(p,\dot{q})\geq (p,\dot{q'})\in E$. Now $K\cap E\neq \emptyset$, but since $K$ is a filter containing $i[G]$, this means that there is $(p,\dot{q})\in E\cap K$ s.t. $p^*\Vdash \dot{q}\in \dot{D}$ and $p\leq p^*$. Hence $\dot{q}_G\in H\cap D$.
+
+    To show $G*H = K$, $\supseteq$ is obvious. For $p\in G$ and $\dot{q}_G\in H$, then $(p,\dot{1}), (p', \dot{q})\in K$ for some $p'$ and hence there is $(p'',\dot{q'})\in K$ and $p''\Vdash \dot{q'}\leq \dot{q}$, which means that $(p,\dot{q})\geq (p'',\dot{q'})$, and the former is in $K$.
+
+    The generic extensions are equal by two minimality arguments.
+\end{proof}
+
+Now we discuss the chain conditions between $\mathbb{P}, \dot{\bbQ}$ and their product.
+
+\begin{lemma}[Lemma V.3.8 in Kunen][AC]
+    $\kappa$ is regular and $\bbP$ is $\kappa$.c.c. For a name $\dot{S}$ s.t. $1\Vdash [\dot{S}\subseteq \kappa\land |\dot{S}|<\kappa]$. Then there is $\beta<\kappa$ s.t. $1\Vdash \dot{S}\subseteq \beta$.
+\end{lemma}
+
+\begin{proof}
+    Let $E  = \{\alpha<\kappa\mid \exists p(p\Vdash \alpha = sup(\dot{S})) \}$. $|E|\leq \kappa$ since the elements in $E$ can index an antichain in $\bbP$(let $\alpha$ index $p_\alpha$ s.t. it forces $\alpha = sup(\dot{S})$). Hence $E\subseteq \beta$ for some $\beta\in \kappa$.
+
+    Since $\mathbb{P}$ is $\kappa$.c.c., and it preserves regularity for elements greater than $\kappa$ by theorem IV.7.9, hence $1\Vdash \kappa\text{ is regular}$. Hecne $1\Vdash sup(\dot{S})<\kappa$. If $1\not\Vdash \dot{S}\subseteq \beta$, then there is $q$ forcing $sup(\dot{S}) = \alpha > \beta$, this is a contradiction to construction of $E$.
+\end{proof}
+
+\begin{lemma}\label{lem:5}
+    If $\bbP$ satisfies the $\kappa$-c.c. condition and $1\Vdash \bbQ \text{ has the $\kappa$-c.c. condition}$, then $\bbP*\dot{\bbQ}$ is $\kappa$-c.c.
+\end{lemma}
+
+\begin{proof}
+    Assume for contradiction that $(p_\xi,\dot{q_\xi}), \xi<\kappa$ is an antichain. Let $\dot{S} = \{(\check{\xi},p_\xi)\mid \xi<\kappa\}$, then $1\Vdash \dot{S}\subseteq \kappa$. Since for each $p_\xi$, there is $\bbP$ generic $G$ s.t. $p_\xi\in G$ and thus $M[G]\models \xi\in \dot{S}$, there is no $\beta$ s.t. $1\Vdash \dot{S}\subseteq \beta$.
+
+    A contradiction is derived as long as we show that $1\Vdash |\dot{S}|<\kappa$. For arbitrary $\bbP$ generic $G$, since $M[G]\models \bbQ\text{ is $\kappa$-c.c.}$, to show that $M[G]\models |\dot{S}|<\kappa$, it suffice to show that $M[G]$ thinks $\{\dot{q_\zeta}_G\mid \zeta\in \dot{S}_G\}$ is an antichain. For $\dot{q_\xi}_G,\dot{q_\zeta}_G$ where $\xi\neq \zeta$, if there is $q_G\leq \dot{q_\xi}_G,\dot{q_\zeta}_G$, then there is $p\in G$ s.t. $p\Vdash q\leq \dot{q_\xi},\dot{q_\zeta}$. Since $p_\xi,p_\zeta\in G$, by the property of a filter, there is $(p',q)\leq (p_\xi,\dot{q_\xi}), (p_\zeta, \dot{q_\zeta})$. This is a contradiction.
+\end{proof}
+
+\begin{definition}
+    An iteration is $<\kappa$-supported if for each limit $\zeta$, $$\bbP_\zeta = \{p\mid |support(p)|<\kappa\}$$
+\end{definition}
+
+In particular, in finite support forcing the limit step can be viewed as $\bigcup_{\alpha<\zeta}\bbP_\alpha$.
+
+\begin{lemma}[Lemma V.3.17 in Kunen]\label{lem:6}
+    In finite support iteration, is for all $\xi<\alpha$, $1_\xi\Vdash [\dot{\bbQ}_\xi \text{ is c.c.c.}]$. Then $\bbP_\alpha$ is c.c.c.
+\end{lemma}
+
+\begin{proof}
+    Prove by induction. Successor step is just Lemma \ref{lem:5}. 
+
+    Limit step: Suppose for contradiction that $\{p^\mu\mid \mu<\omega_1\}$ forms an antichain for $\bbP_\alpha$, where $\alpha$ is a limit, then apply $\Delta$-system lemma on $\{support(p^\mu)\mid \mu<\omega_1\}$, we have an uncountable subset $I$ of $p^\mu$ and a finite root $R$ s.t. for each $p^{\mu_1}\neq p^{\mu_2}\in I$, $support(p^{\mu_1})\cap support(p^{\mu_2}) = R$. 
+
+    Fix $\zeta$ s.t. $R\subseteq \zeta<\alpha$. Then observe that $\{p|_\zeta\mid p\in I\}$ is an antichain in $\mathbb{P}_\zeta$: if $q\leq p_1|_\zeta,p_2|_\zeta$ where $p_1,p_2\in I$, then $q$ can be extended to a $\alpha$ sequence which is less than $p_1,p_2$, since $p_1,p_2$ are both non $1$ only before $\zeta$. This is an contradiction to the c.c.c. of $\mathbb{P}_\zeta$.
+\end{proof}
+
+\section{A model for $MA$ and $\neg CH$}
+
+\begin{definition}[Martin's Axiom]
+    $MA_\bbQ(\kappa)$ stands for the statement that: For the poset $\bbP$, for any family of dense sets of $P$ s.t. $|\mathcal{F}| = \kappa$, there is a $\bbP$ generic filter over $\mathcal{F}$.
+
+    $MA(\kappa)$ stands for the statement that: For any poset $\bbP$  satisfying the c.c.c. condition, $MA_\bbP(\kappa)$ holds.
+
+    $MA$ stands for the the statement that: $MA(\kappa)$ holds for all $\kappa< 2^{\aleph_0}$
+\end{definition}
+
+
+
+Next we explain two restraints in the MA, restriction to cardinals under the continuum and c.c.c. posets.
+
+If we do not restrict our discussion to c.c.c. posets, then there will be obvious counter examples. 
+
+\begin{lemma}[Lemma III.3.15 in Kunen]
+    $Fn(\aleph_0,\aleph_1)$ does not have a generic filter over 
+    a family of dense set $\mathcal{F}$ whose cardinality is $\aleph_1$.
+\end{lemma}
+
+\begin{proof}
+    Consider the following family of dense sets:
+
+    $$D_\alpha = \{p\mid \exists \beta\in \aleph_1, (\alpha,\beta)\in p\} \text{ for all }\alpha\in \aleph_0$$
+
+    $$R_\beta = \{p\mid \exists \alpha\in \aleph_0, (\alpha,\beta)\in p\} \text{ for all }\beta\in \aleph_1$$
+
+    Suppose for contradiction that there is $G$ generic over this family, then $\bigcup G$ would be a surjection from $\aleph_0$ to $\aleph_1$, a contradiction.
+\end{proof}
+
+Also, it is meaningless to discuss dense set families of caridinality greater than the continuum.
+
+\begin{lemma}[Lemma III.3.13 in Kunen]
+    The poset $Fn(\aleph_0,\aleph_0)$ has a dense set family $\mathcal{F}$ of cardinality $2^{\aleph_0}$ s.t. there is no $G$ generic over $\mathcal{F}$.
+\end{lemma}
+
+\begin{proof}
+    Let's call the poset under discussion $Fn(I,J)$ where $I,J$ are countable. Consider the following family of posets:
+
+    $$D_i = \{p\mid \exists j\in j, (i,j)\in p\} \text{ for all }i\in I$$
+
+    $$D_f = \{p\mid p\not \subseteq f\} \text{ for all }f\in J^I$$
+
+    Suppose for contradiction that there is $G$ generic over this family, then $\bigcup G$ is a function from $I$ to $J$ but is different from any element in $J^I$, which is a contradiction.
+\end{proof}
+
+Martin's Axiom is trivial under the assumption of $CH$. Now we start to discuss how to construct a model for Martin's Axiom where $CH$ does not hold. It turns out that $MA \land \mathfrak{c} = \kappa$ is consistent for any $\kappa$ that is regular and $2^{<\kappa} = \kappa$. The main idea is rather simple, we just list all relevant posets and force over them iteratively to add a generic filter for each of them, so that MA would be satisfied. But of course, there are many techincal points to deal with.
+
+First, since Martin's Axiom quantifies over all posets, which is a proper class, we seek to represent posets with ordinals. In particular, we show that if $MA(\kappa)$ is false, then there is a $\bbQ$ with cardinality less than $\kappa$ that witness it's failure.
+
+\begin{lemma}[Lemma III.3.51 in Kunen]
+    If not $MA_\bbP(\kappa)$, then there is $\bbQ\subseteq \bbP$ s.t. $|\bbQ|\leq \kappa$ and not $MA_\bbP(\kappa)$.
+\end{lemma}
+
+\begin{proof}
+    Say $\bbP$ does not have a filer generic over $(D_\alpha)_{\alpha<\kappa}$.
+    Consider the first order language $(\leq,1,(D_\alpha)_{\alpha<\kappa})$ and by L\"owenheim  Skolem theorem, take a $\bbQ$ s.t. $|\bbQ|<\kappa$ that is an elementary substructure of $\bbP$. Then $D_\alpha$ interpreted in $\bbQ$ are dense in $\bbQ$, moreover, $D_\alpha$ interpreted in $\bbQ$ is just $D_\alpha\cap \bbQ$, since for all $q\in \bbQ$, $\bbQ\models D_\alpha q$ iff $\bbP\models D_\alpha q$.
+
+    Now suppose for contradiction that there is a $G\subseteq \bbQ$ generic over the family $\bbQ\cap D_\alpha$, then $G' = \{p\in \bbP\mid \exists q\in G, q\leq p\}$ is a filter generic over $D_\alpha$. This is a contradiction.
+\end{proof}
+
+As a consequence of this lemma, we can restrict our discussion to the posets represented by ordinals under a given cardinal:
+
+\begin{lemma}[Lemma V.4.3 in Kunen]\label{lem:10}
+    For any cardinal $\theta$, $MA(\theta)$ iff $MA_\bbQ(\theta)$ for all posets of the form $(\alpha, \preceq, 0)$ having c.c.c. and $\alpha\leq \theta$.
+\end{lemma}
+
+
+
+\begin{definition}
+    Let $Ntbc(\alpha,\dot{\preceq},\bbP)$ be the statement that $\dot{\preceq}$ is a $\bbP$-nice name for a subset of $\alpha^2$ and $$1\Vdash_\bbP (\check{\alpha},\dot{\preceq},\check{0})\text{ has c.c.c.}$$
+\end{definition}
+
+This relation passes downward in iterated forcing:
+
+\begin{lemma}
+    If $\bbP_1$ is c.c.c., $\bbP_0\subseteq_c\bbP_1$ and $\dot{\preceq}$ is a $\bbP_0$ name, then $Ntbc(\alpha,\dot{\preceq},\bbP_1)$ entails $Ntbc(\alpha,\dot{\preceq},\bbP_0)$.
+\end{lemma}
+
+\begin{theorem}[Theorem V.4.1 in Kunen]\label{thm:consistency-MA}
+    Assume that $\kappa>\omega$ is a regular cardinal s.t. $2^{<\kappa} = \kappa$. Then there is a poset $\bbP$ of size $\kappa$ such that $1\Vdash MA\land 2^{\aleph_0} = \kappa$.
+\end{theorem}
+
+The main proof idea is to cover all the posets of the form $(\alpha,\preceq,0)$ ($\alpha<\kappa$) in the place of $\mathbb{Q}_\xi$ with the iterated forcing. They can be covered as there are altogether $2^{<\kappa}$ many such posets, and by assumption, they can be covered in $\kappa$ many steps. Say $(\alpha,\preceq,0)$ is considered at step $\xi$, so $\bbP_{\xi+1} = \bbP_{\xi}*(\check{\alpha},\dot{\preceq},\check{0})$, then all dense sets $D$ of $(\alpha,\preceq,0)$ would be in $M[G\cap \bbP_\xi]$. And $M[G\cap \bbP_{\xi+1}]\subseteq M[G]$ contains a generic filter.
+
+Now that all the representing posets $\bbQ$ satisfies $MA_\bbQ(\kappa)$, we apply Lemma \ref{lem:10} to reach the conclusion that $MA(\kappa)$.
+
+There is a subtlety here, we must ensure that at each step, $\bbQ_\xi$ is already a $\bbP_\xi$ name, so at each step we only consider to cover the posets that has already exists in $\bbP_\xi$. Though each step we may create more `posets' to be considered, they will eventually all be covered by the end of the recursion.
+
+\begin{proof}
+    We will construct an iterated forcing with finite support. Hence to specify the forcing poset, it suffice to specify the successor step. Recursively, we construct $\mathbb{P}_\xi$ satisfying:
+
+    1. $|\bbP_\xi|<\kappa$ 2. $1_\xi\Vdash \bbQ_\xi$ has c.c.c. condition.
+        
+    Before constructing, fix a bijection $f:\kappa\to \kappa^2$ s.t. if $f(\xi) = (\zeta,\mu)$, then $\zeta\leq \xi$. The $f$ index what poset we will `fix' at each step. At step $\xi$, we will let $\bbQ_\xi$ be the $\mu$th poset listed at step $\zeta$ and deal with it.
+
+    For $\zeta<\kappa$, let $(\alpha^\mu_\zeta,\dot{\preceq}^\mu_\zeta),\mu<\kappa$ be the list of all pairs of nice name for partial order on $\alpha$. The list is possible as there are at most $|\bbP_\xi|^{|\alpha|}$ many nice names for subsets of $\check{\alpha^2}$, which by $2^{<\kappa} = \kappa$ is less than $\kappa$.
+
+    The successor step is constructed as follows. Given $\bbP_\xi$, say $f(\xi) = (\zeta,\mu)$, $i_*(\dot{\preceq}^\mu_\zeta)$ is also a nice name of $\bbP_\xi$. We let $\dot{\bbQ}_\xi$ be $i_*(\dot{\preceq}^\mu_\zeta)$ if $Ntbc(\alpha,\dot{\preceq},\bbP)$; and $\dot{\bbQ}_\xi$ be some trivial poset $\{1\}$.
+
+    This gives the desired $\bbP$. Let $G$ be  $\bbP$ has c.c.c. by Lemma \ref{lem:6} and hence it preserves cardinals. Notice that $|\bbP| \leq \kappa$ and by counting nice names we have $M[G]\models 2^{\aleph_0}\leq \kappa$. Finally we show that for each $\theta<\kappa$, $M[G]\models MA(\theta)$ and this gives $M[G]\models MA\land \kappa = 2^{\aleph_0}$ as $\bbP$ preserves cardinals and $MA$ automatically fail for cardinals greater than the continuum.
+
+    By Lemma \ref{lem:10}, it suffice to verify posets of the form $\bbQ = \alpha,\preceq,0$. Let $D_\beta$ be a family of dense subsets of $\bbQ$, and $\dot{D_\beta}$ be a nice name of its element, $\dot{\preceq}$ be a name of $\preceq$ where $Ntbc(\alpha,\dot{\preceq},\bbP)$. The forcing conditions mentioned by these names are bounded by some $\bbP_\zeta$, say $\dot{\preceq}$ is listed as $\preceq^\mu_\zeta$. Then at step $\bbQ_\xi$ where $f(\xi) = (\zeta,\mu)$, by Lemma 11 we have $\bbP_{\xi+1} = \bbP_\xi * (\check{\alpha}, i_*(\preceq^\mu_\zeta), \check{0})$ and hence $M[G\cap \bbP_{\zeta+1}]$ contains a filter meeting all dense sets in $M[G\cap \bbP_{\zeta}]\supseteq \{D_\beta\}_\beta$.
+\end{proof}
+
+\section{Implications of MA}
+
+In Theorem \ref{thm:consistency-MA}, we reuquired that $\kappa$ be regualr and $2^{<\kappa} = \kappa$. It turns out that the condition is necessary by the following theorem:
+
+\begin{theorem}
+    $MA$ implies that $\mathfrak{c}$ is regular and $2^\kappa = \mathfrak{c}$ for all $\kappa<\mathfrak{c}$.
+\end{theorem}
+
+\begin{proof}
+    It suffice to prove that for each $\kappa<\mathfrak{c}$, $2^{\kappa}\leq 2^{\aleph_0}$. For if so, $2^{\kappa}= \mathfrak{c}$ and $cf(\mathfrak{c}) = cf(2^\kappa)>\kappa$.
+
+    Fix a almost disjoint family of cardinality $\kappa$, $\mathcal{A} = \{A_\alpha\mid \alpha<\kappa\}$. We show that for each $X\subseteq \kappa$, there is $A\subseteq \omega$ s.t. $$\alpha\in X\text{ iff }A\cap A_\alpha \text{ is infinite}$$
+
+    This produces a surjection from $\mathcal{P}(\omega)$ to $\mathcal{P}(\kappa)$.
+
+    Now let $\mathbb{P}$ be the collection of partial functions from $\mathcal{\kappa}$ to $\{0,1\}$ s.t. 
+
+    \begin{enumerate}
+        \item $dom(p)\cap A_\alpha$ is finite for $\alpha\in X$.
+        \item $\{n\in A_\alpha\mid p(n) = 1\}$ is finite.
+    \end{enumerate}
+
+    Consider the following dense set:
+
+    $D_\beta = \{p\mid A_\beta\subseteq p\}$ for all $\beta\in \kappa - X$.
+
+    $E_{m,\alpha} = \{p\mid |\{n\mid p(n) = 1\}|\geq m\}$ for all $m\in \omega$, $\alpha\in X$.
+
+    We wish to take $A$ as the set of natural numbers that the generic filter takes to be $1$. The $D_\beta$ part ensures that $A\cap A_\beta$ is finite for all $\beta\in \kappa - X$, it is dense as the family is almost disjoint. The $E_{m,\alpha}$ part eventually ensures that $A\cap A_\alpha$ is infinite.
+
+    Let $G$ be generic over this set of dense set and take $A = \{n\mid \bigcup G(n) = 1\}$ and we are done.
+\end{proof}
+
+The trick in the previous poset construction is that even though we allow infinite domain partial orders, $\omega$ is separated by the almost disjoint family s.t. from the perspective of the almost disjoint family we care, the functions are of finite domain.
+
+\begin{lemma}
+    There is an almost disjoint family of $\omega$ of cardinality $\mathfrak{c}$. 
+\end{lemma}
+
+\begin{proof}
+    Fix a bijection $\pi:\omega^{ <\omega} \to \omega$. Consider the set of functions $\omega^\omega$, we turn it into an almost disjoint family by the following coding: Let $X_f = \{\pi(f|_n)\mid n\in \omega\}$.
+\end{proof}
+
+The following theorem shows that under $MA$, a stronger version of Baire Category Theorem holds:
+
+\subsection{MA's Implication on Topology}
+
+\begin{theorem}[Lemma.3.18 in Kunen, Theorem 16.23 in Jech]
+ Under $MA(\kappa)$,
+\begin{enumerate}
+    \item For any Hausdorff and compact space $X$, if $\{A_\alpha\mid \alpha<\mathfrak{\kappa}\}$ are nowhere dense, then $\bigcup_{\alpha<\kappa}A_\alpha\neq X$.
+    \item For the real line with the standard topology, the intersection of $\kappa$ many open dense sets is dense.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+    For the first bullet point, consider the poset $\bbP$ of the open intervals of $X$, ordered by inclusion. Consider the following family of dense sets,
+
+    $D_\alpha = \{p\mid cl(p)\cap A_\alpha = \emptyset\}$ for $\alpha<\kappa$.
+
+    The $MA$ ensures a $G$ generic over the family. Since $G$ has finite intersection property and $X$ is compact, $\bigcap\{cl(p)\mid p\in G\}\neq \emptyset$. Since there is $p\in G$ s.t. $cl(p)\cap A_\alpha = \emptyset$ for all $\alpha<\kappa$, $\bigcap\{cl(p)\mid p\in G\}\cap A_\alpha = \emptyset$ for all $\alpha<\kappa $. Hence $X\neq \bigcup_{\alpha<\kappa}A_\alpha$.
+
+    For the second, let $U_\alpha,\alpha<\kappa$ be the family of open dense sets. For arbitrary basic open set $(a,b)$, consider $I = [a+\epsilon,b-\epsilon]$, $I - U_\alpha$ is nowhere dense in $I$. By the first bullet point, $\bigcap_{\alpha<\kappa}U_\alpha \cap I\neq \emptyset$.
+\end{proof}
+
+Indeed, statement 1 is equavalent to $MA(\kappa)$. To see this, for a poset $\bbP$, take its separative quotient and completion to get the boolean algebra $\mathcal{B}$. Take the stone dual of $\mathcal{B}$, $X$. A family of dense sets $D_\alpha$ in $\bbP$ gives a family of dense open set in $X$ by $U_\alpha = \bigcup\{[p]\mid p\in D_\alpha\}$, then their intersection is not empty by assumption. Notice this means that there is an ultrafilter in the intersection and the reflection of this ultrafilter would be a generic ultrafilter.
+
+The above theorem can be strengthened to the following theorem, which shows that under $MA(\kappa)$ meager sets is closed under $\kappa$ union.
+
+\begin{theorem}[Lemma 26.40 in Jech]
+    Under $MA(\kappa)$, let $A_\alpha,\alpha<\kappa$ be closed nowhere dense sets of reals and $A = \bigcup_{\alpha<\kappa}A_\alpha$. Then there is a countable family of dense open sets $H_i$ s.t. $A$ is disjoint from $\bigcap_n H_n$. Consequently, meagre sets are closed under $\kappa$ union for $\kappa<\mathfrak{c}$.
+\end{theorem}
+
+\begin{proof}
+    Consider the poset consisting of the condition of the form:
+    $$p = \langle (U_0,E_0)\dots (U_n,E_n)\rangle$$
+    s.t. \begin{enumerate}
+        \item each $U_i$ is the union of finitely many open rational intervals.
+        \item each $E_i$ is a finite subset of $\kappa$;
+        \item for each $i$, $U_i$ is disjoint from $\bigcup_{\alpha\in E_i}A_\alpha$
+    \end{enumerate}
+    We write $U_i$ as $p_{i,0}$ and $E_i$ as $p_{i,1}$.
+
+    We say $p\leq q$ if $p$ is longer than $q$ and for each index $i$ that $p,q$ shares, $p_{i,0}\supseteq q_{i,0}$ and $p_{i,1}\supseteq q_{i,1}$.
+
+    The notion has c.c.c. as there are altogether countably many sequences of rational intervals, and if the rational interval part of $p,q$ are the same ($p,q$ are of the same length and $p_{i,0} = q_{i,0}$ for all $i$), then they are compatible.
+
+    Consider the following dense sets:
+    $$D_\alpha = \{p\mid \alpha\in p_{i,1}\text{ for some }i\}$$
+    $$E_{i,k} = \{p\mid p_{i,0}\cap I_k \neq \emptyset\}$$
+    Here $I_k$ is the k-th rational open interval. $E$ is dense as every element in $E$ is closed and nowhere dense.
+
+    Let $G$ be a generic filter over the notion, then consider $U_n = \bigcup\{p_{n,0}\mid p\in G\}$, it is open dense as $G$ meets every $E_{i,k}$. If $x\in A_\alpha$, then $x\in p_{n,1}$ for some $p\in G$ and hence $x\not\in U_n$. Hence $A$ is disjoint from $\bigcap_{n}H_n$.
+    
+\end{proof}
+
+Moreover, under $MA(\kappa)$, the $\kappa$ union of meagers sets is meager. This statement is stronger than $MA$. For a proof, see Kunen III.1.25, III.3.22.
+
+% Now we start to show that the $\kappa$ union of meagers sets is meager.
+
+% Let $X\subseteq^* Y$ ($X$ is a pseudo-subset of $Y$) if $Y - X$ is finite.
+
+% \begin{definition}
+%     $\mathfrak{p}$ is the least size of a family $\mathcal{X}\susbeteq [\omega]^\omega$ such that for any $X_1,\dots ,X_n\in \mathcal{X}$, their intersection is infinite, and there is no $K\in [\omega]^\omega$ s.t. $K\subseteq^* X$ for all $X\in \mathcal{X}$.
+% \end{definition}
+
+% \begin{lemma}[Lemma III.1.25 Kunen]
+%     For each $\kappa\leq\mathfrak{p}$, meager sets are closed under $\kappa$ union.
+% \end{lemma}
+
+% \begin{proof}
+    
+% \end{proof}
+
+\subsection{MA's Implication on Measure}
+
+Naturally, there is a parallel statement for null sets.
+
+\begin{theorem}[Lemma.3.28 in Kunen]
+    If $N_\alpha$, $\alpha<\kappa$ is a family of subset of the real that is Lebesgue null, then their union is.
+\end{theorem}
+
+\begin{proof}
+    For arbitrary $\epsilon$, we find an open cover of $\bigcup_{\alpha<\kappa}N_\alpha$ that has measure less than $\epsilon$.
+
+    Consider the following poset: $\bbP$ consisting of open sets whose meansure is less than $\epsilon$, ordered by reverse inclusion.
+
+    First we show that it has c.c.c. suppose for contradiction that there is an antichain of length $\omega_1$, then $\mu(p_\xi\cup p_\zeta)>\epsilon$. Choose $E_\delta = \{\xi<\omega_1\mid \mu(p_\xi)\leq \epsilon - 3\delta\}$ that is uncountable, such $E$ exists as $\bigcup_{n\in \omega} E_{\frac{1}{n}} = \omega_1$, but $cf(\omega_1)>\omega$. Let $\mathcal{F}$ be the field generated by rational intervals, for $p_\xi, \xi\in E_\delta$ pick $W_\xi\in \mathcal{F}$ s.t. $\mu(p_\xi - W_\xi) \leq \delta$. Then $\mu(W_\xi\cup W_\zeta) \geq \mu(p_\xi\cup p_\zeta) - 2\delta \geq \epsilon - 2\delta$ as long as $\xi\neq \zeta$. But since $\mathcal{F}$ is countable, there is $\xi\neq \zeta$ s.t. $W_\zeta = W_\xi$, this entails $\epsilon - 2\delta\leq \mu(W_\xi)\leq \mu(p_\xi)\leq \epsilon - 3\delta$, a contradiction.
+
+    If $G$ is a filter over the poset, to show that $\bigcup G$ has measure less than $\epsilon$. $\bigcup G$, as a subspace of $\mathbb{R}$, is separable, and $G$ is an open cover of it, we take countable $G_0\subseteq G$ s.t. $\bigcup G_0\supseteq \bigcup G$ by Lemma \ref{lem:second-countable-entails-Lindelof}, let $G_0 = \{p_n\mid n\in \omega\}$, then each $\bigcup^m_{n = 0}p_n$ has a point lower than it in $G_0$, thus $\mu(\bigcup^m_{n = 0}p_n)< \epsilon$. As $sup_{m\in \omega}\mu(\bigcup^m_{n = 0}p_n) = \mu(\bigcup G)$, $\mu(\bigcup G) \leq \epsilon$. 
+
+    Now consider the following set of dense sets:
+
+    $D_\alpha = \{p\mid p\subseteq N_\alpha\}$ for $\alpha<\kappa$.
+
+    This is dense as $N_\alpha$ is null. Let $G$ be generic over the family, $\bigcup G$ covers the $\kappa$ union and has measure less or equal than $\epsilon$.
+\end{proof}
+
+\begin{lemma}\label{lem:second-countable-entails-Lindelof}
+    If $X$ a topology space is separable, then every open cover of it has a countable subcover.
+\end{lemma}
+
+\begin{proof}
+    Let the open cover by $U_i, i\in I$, well order $I$.
+    Let $\mathcal{B} = \{B_n\mid n\in \omega\}$ be a countable base of $X$. Define $$N = \{n\in \omega\mid \text{there is }j\in J, B_n\subseteq U_j\}$$
+    $$J = \{\text{the first }j\in I\mid \text{there is }n, B_n\subseteq U_j\}$$
+
+    Then $J$ is countable, we shoe that $U_j,j\in J$ covers $X$. For $x\in X$, $x\in U_i$ for some $i\in I$, then $x\in B_n\subseteq U_i$, hence $n\in N$ and hence $x$ is covered by some $U_j$.
+\end{proof}
+
+Finally, under CH there is the famous duality between null sets and meagre sets. I wonder whether this is still true under MA.
+
+\subsection{MA's Implication on Posets}
+
+Now we trun to the implication of Martin's Axiom on posets. This part is a mix of materials from Kunen and Jech. But before discussing MA's implication on posets, we first recall the famous Delta system lemma.
+
+\begin{lemma}[Delta System Lemma]\label{Lem:Delta-system}
+    Let $\lambda,\kappa$ be regular cardinals such that $\omega\leq \lambda <\kappa$, if for any $\theta<\kappa$, $\theta^{<\lambda}<\kappa$, then for each family of sets $\mathcal{A}$ of cardinality $\kappa$, s.t. $|A|<\lambda$ for each $A\in \mathcal{A}$, there is $\mathcal{B}\subseteq \mathcal{A}$ s.t. $\mathcal{B}$ forms a delta system ,in the sense that there is $R$ s.t. $X\cap Y = R$ if $X\neq Y\in \mathcal{B}$.
+\end{lemma}
+
+% \begin{lemma}
+%     Let $\theta$ be a cardinal greater than $\lambda$, if $M$ is a model s.t. $\lambda\subseteq M$ and $M\preceq H(\theta)$, then\begin{enumerate}
+%         \item If $a\in M$ and $|a|\leq\lambda$, then $a\subseteq M$.
+%         \item If $a\subseteq M$ and $|a|< \lambda$, then $a\subseteq M$.
+%     \end{enumerate} 
+% \end{lemma}
+
+% \begin{proof}
+%     There is a surjective function $f:\lambda\to a$. By the assumption $f\in H(\theta)$ and hence by elementariness there is $f$ in $M$ that is surjective from $\lambda$ to $a$. ($\lambda$ is in $M$ since $\lambda = sup\lambda$.) Hence $a = \{f(\xi)\mid \xi<\lambda\}\subseteq M$.
+% \end{proof}
+
+% \begin{proof}[Proof of theorem \ref{Lem:Delta-system}]
+%     For any $R$ of cardinality $<\lambda$, we let $\Delta(R,\mathcal{D})$ be the statement `$R\subseteq X$ for all $X\in \mathcal{D}$ and for $X\neq Y\in \mathcal{D}$, $X\cap Y = R$.' Let max$\Delta(R,\mathcal{B})$ be the statement $\mathcal{B}$ is maximal w.r.p. $\{\mathcal{D}\subseteq \mathcal{A}\mid \Delta(R,\mathcal{D})\}$, such family exists by Zorn.
+
+%     Now fix a cardinal $\theta$ s.t. $\mathcal{A}\in H(\theta)$, and choose an elementary submodel $M\preceq H(\theta)$, $|M| = \lambda$ and $\lambda \subseteq M$. Now since $|M|^{<\lambda}<\kappa$, there is $X_0\in \mathcal{A}$ s.t. $X_0\not\in M$. Let $R = X_0\cap M$
+% \end{proof}
+
+% \textcolor{red}{I'm not sure this proof is rigorous. 1. does $\lambda\subseteq M$ entails $\lambda\in M$?}
+
+\begin{definition}[Definition 3.23,3.31 Kunen, Definition 15.13 Jech]
+    For a poset $\bbP$, a subset $Q\subseteq \bbP$ is \textbf{centered} if for all $q_1,\dots,q_n\in Q$, there is $p\in \bbP$ below all of them.
+
+    $\bbP$ is \textbf{$\sigma$-centered} if it is a union of countably many centered subsets
+
+    $\kappa$ is a \textbf{pre-caliber} of $\bbP$ if for each subset $Q$ of $\bbP$ of size $\kappa$, there is a subset $Q_0\subseteq Q$ that is of size $\kappa$ and is centered.
+
+    $\bbP$ is \textbf{$\kappa$-knaster} if for each subset $Q$ of $\bbP$ of size $\kappa$, there is a subset $Q_0\subseteq Q$ that is of size $\kappa$ and is pairwise consistent.
+\end{definition}
+
+The following implication relation is clear: $\kappa$ pre-calibler entails $\kappa$-knaster entails $\kappa$-c.c.
+
+ZFC can not show that the product of two c.c.c. posets are c.c.c. But this is provable under MA. First, notice that pre-calibar and knasterness is preserved under product.
+
+\begin{lemma}
+    If $\bbP$,$\bbQ$ has $\kappa$ as pre-calibar and $\kappa$ is regular, so does $\bbP\times \bbQ$.
+\end{lemma}
+
+\begin{proof}
+    Take $B\subseteq \bbP\times \bbQ$ s.t. $|B| = \kappa$.
+    If there is $p\in \bbP$ such that $B_p = \{q\in \bbQ\mid (p,q)\in B\}$ is of size $\kappa$, apply the property to $B_p$ and we are don. The same is true if there is $q\in \bbQ$ such that $B_q$ is of size $\kappa$.
+
+    If for all $p\in \bbP$, $|B_p|<\kappa$  and for all $q\in \bbQ$, $|B_q|<\kappa$, then the projection of $B$ on $P$, $p_\bbP(B) = \{p\mid \exists q\in \bbQ, (p,q)\in B\}$ is of size $\kappa$. Recursively, we define a one-one function that is a subset of $B$. Given $(p_\beta,q_\beta),\beta<\alpha$, notice the $p$ that corresponds to something already considered, or $\{p\mid \exists q_\beta,(p,q_\beta)\in B\}$ is of size less than $\kappa$, pick $p_\alpha$ as the first element in $p_\bbP(B) $ not in this set, and an arbitrary $q_\alpha$ s.t. the pair is in $B$. Then we are done.
+
+    Given the function $F\subseteq B$, it is not hard to find a $\kappa$ sized subset of $F$ that is centered.
+\end{proof}
+
+The same is true for knasterness by a similar argument, see Lemma 15.14 of Jech.
+
+\begin{lemma}[Lemma III.3.35 in Kunen]
+    Under $MA(\aleph_1)$, each c.c.c. poset has $\aleph_1$ as its pre-caliber.
+\end{lemma}
+
+\begin{proof}
+    For each $\omega_1$ family $p_\alpha,\alpha<\omega_1$ of elements, we find a filter containing $\omega_1$ many elements of the family, which would be a centered family.
+
+    Consider the following set: $$D_\alpha = \{p\mid \exists \beta\geq \alpha (q\leq p_\beta)\}$$
+
+    We argue that this family is dense under some element $p$, if not, for each $\xi$ there is $D_{\alpha_\xi}$ not dense below $p_\xi$, i.e. there is $r_\xi\leq p_\xi$ s.t. $\neg \exists q\leq r_\xi \exists \beta\geq \alpha_\xi(q\leq p_\beta)$, so that $\forall \beta \geq \alpha_\xi(r_\xi \bot r_\beta)$. Hence we can recursively choose $\xi_\nu$ s.t. $\mu<\nu$ entails $\xi_\mu>\alpha_{\xi_\nu}$, which would form an uncountable antichain for the $r$, this is a contradiction.
+\end{proof}
+
+As a corollary, we gain that under $MA$, c.c.c. is preserved under finite products. Indeed, by a similar argument, all $\kappa$-c.c. condition does. 
+
+$\kappa$ knaster are preserved under arbitrary finite support product by a Delta system argument, so under $MA$, c.c.c. are preserved under arbitrary finite support product.
+
+\begin{lemma}
+    For a family $\bbP_i,i\in I$ of $\kappa$-knaster posets, if for every finite subfamily $I_0\subseteq I$, $\prod_{i\in I_0}\bbP_i$ is $\kappa$-knaster, then $\prod^{fin}_{i\in I}\bbP_i$ is $\kappa$-knaster. 
+\end{lemma}
+
+\begin{proof}
+    For a $\kappa$ family $\mathcal{A}$ of elements in $\bbP^{fin}_{i\in I}\bbP_i$, its support form a delta system and by Lemma \ref{Lem:Delta-system} pick $\mathcal{B}\subseteq \mathcal{A} $ s.t. $|B| = \kappa$ and for $p\neq q\in \mathcal{B}$, the intersection of their support is $S$. If $S$ is emptyset, then $\mathcal{B}$ is a a compatible family of cardinality $\kappa$. If $S$ is not empty, then inductively use $\kappa$-knasterness on the support $S = \{i_{n_1}\dots i_{n_k}\}$ to find a $\kappa$ sized compatible family. 
+\end{proof}
+
+It follows that:
+
+\begin{corollary}[Theorem III.3.43 in Kunen]
+    Under $MA(\aleph_1)$, c.c.c. are preserved under finite products.
+\end{corollary}
+
+\section{Suslin Hypothesis}
+
+\begin{definition}[Suslin Line]
+    A Suslin Line is a dense, linearly ordered set that satisfies the c.c.c. condition, but is not separable.
+\end{definition}
+
+In our discussion of trees, we basically follow the notational convention of Jech, but we reverse the order such that the root of a tree is the maximal element of the tree instead of minimal. We reverse the order so as to more naturally view trees as forcing posets, but it does not really matter.
+
+\begin{definition}[Tree]
+    A tree is a partially ordered set $(T,<)$ satisfying for each $x\in T$, its predecessors $\{y\mid y\geq x\}$ are well-ordered.
+
+    The order type of an element, is the order type of its predecessors: $o(x) = o(\{y\mid y\geq x\})$.
+
+    The height of $T$, $h(T)$ is $sup\{o(x)+1\mid x\in T\}$.
+\end{definition}
+
+In a tree, two elements does not have a common sucessor iff they are incomparable (not on the same branch): $x_1\bot x_2$ iff not $x_1<x_2$ and not $x_1>x_2$.
+
+\begin{definition}[Suslin Tree]
+    A Suslin tree is a tree such that:
+    \begin{enumerate}
+        \item Its height is $\omega_1$.
+        \item Every branch in $T$ is at most countable.
+        \item Every antichain in $T$ is at most countable.
+    \end{enumerate}
+\end{definition}
+
+\begin{lemma}[Lemma 9.14 in Jech]
+    If there is a Suslin Line, there is a Suslin Tree.
+\end{lemma}
+
+\begin{proof}
+    The tree would consist of open intervals on the suslin line $S$, ordered by inclusion. Recursively, we define $T = \{I_\alpha\mid \alpha<\omega_1\}$ where $I_\alpha = (a_\alpha,b_\alpha)$ is an interval that does not contain the endpoints of all intervals $I_\beta$, $\beta<\alpha$, and $a_\alpha,b_\alpha$ is not any of the previous endpoints. Such an interval exists since the endpoints of all intervals $I_\beta$, $\beta<\alpha$ is a countable set, and hence is not dense in $S$. We can make sure $a_\alpha,b_\alpha$ is not any of the previous endpoints as the order is dense.
+
+    Then this is a tree since if $\beta<\alpha$, then either $I_\beta,I_\alpha$ are disjoint or $I_\beta\supseteq I_\alpha$. Hence, $\{I\mid I\supseteq I_\alpha\}$ is a suborder of $\alpha$ and hence well ordered. The tree has c.c.c. since $S$ has c.c.c. If $I_1,I_2\dots$ forms an uncountable branch, then the left endpoint of the intervals forms an increasing sequence, hence $(a_\alpha,a_{\alpha+1})$ would form an uncountable disjoint union. Hence the tree is of height $\omega_1$ as each level, being an antichain, is at most countable.
+\end{proof}
+
+\begin{definition}
+    A Suslin Tree is normal if:
+    \begin{enumerate}
+        \item $T$ has a unique maximal point.
+        \item If $x$ is not minimum in $T$, then $x$ has infinitely many immediate successors.
+        \item For each $x$ and $o(x)<\alpha<\omega$ there is some $y<x$ of level $\alpha$.
+        \item If $\beta$ is a limit ordinal, $o(x) = o(y) = \beta$ and $\{z\mid z>x\} = \{z\mid z>y\}$, then $x = y$. The limit nodes are determined by their predecessors.
+    \end{enumerate}
+\end{definition}
+
+A note of point 3: This does not entail that each branch is of length $\omega_1$ (this would be a contradiction). Here a typical quantifier difference is involved: for each height there is a branch of at least that height does not entail that there is a branch of arbitrary height.
+
+\begin{lemma}[Lemma 9.13 in Jech]
+    If there is a Suslin tree, there is a normal Suslin Tree.
+\end{lemma}
+
+\begin{lemma}[Lemma 9.14 in Jech]
+    If there is a normal Suslin Tree, then there is a Suslin Line
+\end{lemma}
+
+\begin{proof}
+    The Suslin line will consist of all the branches of the Suslin Tree. The order is specified as follows: First we define recursively an order $<_\alpha$ on each level.
+    
+    For successor level, if $x,y\in level(\alpha+1)$ has different parents, then $x<_{\alpha+1}y$ iff the immediate parent of $x$ is less than the immediate parent of $y$. If they are from the same immediate parent $z$, then induce an order of rationals on the immediate succesors of $z$ and the order between $x,y$ follow that order. This uses \textcolor{red}{ 2 of normality} and the fact that each antichain of the tree is at most countable.
+
+    For limit level the order is unimportant. (But we can still give a canonical order)
+
+    Now for two branches $s_1,s_2$, they are ordered lexicalgraphically, $s_1<s_2$ if for the first $\alpha$ at which they differ, $s_1(\alpha)<_\alpha s_2(\alpha)$. The order at limit level is unimportant as they never differ first at limit level by \textcolor{red}{4 of normality}.
+
+    Now, this line is of course dense linearly ordered. It has c.c.c. as disjoint family of open intervals would entain an antichain for the tree: for an interval $(s_1,s_2)$, pick $s_3$ in the interval and $a$ an innitial segment of $s_3$ s.t. $\{s\mid a\subseteq s_3\}\subseteq (s_1,s_2)$.
+
+    Finally, the line is not separable as for any countable set of branches, since each branch is countable, there is $\zeta<\omega_1$ greater than the length of all branches. Then the open intervals at level higher than $\zeta$ can not contain any of the branches.
+\end{proof}
+
+\begin{theorem}[Theorem 16.16]
+    $MA_{\aleph_1}$ entails that there is no Suslin Tree.
+\end{theorem}
+
+\begin{proof}
+    Assume for contradiction that $T$ is an normal Suslin Tree, consider the following family of dense sets of $T$: 
+
+    $D_\alpha = \bigcup_{\alpha<\beta}Level(\beta)$
+
+    This is dense by \textcolor{red}{3 of normality}
+
+    An generic filter would be a branch of length $\omega_1$, a contradiction.
+\end{proof}
+
+We will revisit the topic of Suslin Line in the next section and show that adding a Cohen real adds a Suslin Line. See section 28 of Jech.
+
+Here we collect more interesting facts about Suslin tree and a corresponding object, the Aronszajn tree.
+
+\begin{lemma}[Lemma IV.6.4 in Kunen]
+    If $T$ is a normal Suslin tree in ctm $M$, then if $G$ is a $M$ generic filter over $T$, $G$ is a $\omega_1$ branch of $T$ in $M[G]$ and hence it is not Suslin in the extension.
+\end{lemma}
+
+\begin{proof}
+    $D_\alpha = \bigcup_{\alpha<\beta}Level_\beta$ is dense in $T$.
+\end{proof}
+
+\begin{lemma}[Lemma IV.6.5 in Kunen]
+    If $T$ is a Suslin tree, then there is no order preserving map $\varphi: T\to \mathbb{R}$
+\end{lemma}
+
+Here I try to write the proof in forcing over $V$ approach rigorously. 
+
+\begin{proof}
+    First, suppose w.l.o.g. $T$ is a normal Suslin tree , and suppose for contradiction that there is order preserving map $\varphi: T\to \mathbb{R}$. Then apply the previous lemma and find $G$ generic over $V$, then $p \Vdash \check{\varphi}|_{\dot{G}}: \check{\omega_1}\to \check{\mathbb{R}}\subseteq \mathbb{R}$.
+    
+    But this is impossible as $(f(\alpha),f(\alpha+1))$ would be a family of uncountable pairwise disjoint open set, a contradiction to c.c.c. of $\mathbb{R}$.
+\end{proof}
+
+This result poses comparison with the weaker notion, Aronszajn tree. 
+An Aronszajn tree is a tree such that each level is countable, contains no uncountable branches and is of height $\omega_1$. Every Suslin tree is Aronszajn, and Aronszajn is closely tied to order preserving maps into the real:
+
+\begin{theorem}[Theorem III.5.12 in Kunen]
+    There is an Aronszajn tree $T$ and order preserving map $\varphi: T\to \mathbb{Q}$.
+\end{theorem}
+
+
+
+We say that an Aronszajn tree is special if there is a countable collection of antichains $A_n$ s.t. $T = \bigcup A_n$.
+
+\begin{lemma}[Lemma III.5.17 in Kunen]
+    Let $T$ be an Aronszajn tree, then $T$ is special iff there is an order preserving map $\varphi:T\to \bbQ$.
+\end{lemma}
+
+\begin{proof}
+    The if direction is easy as $\varphi^{-1}(q)$ is always an antichain for $q\in \bbQ$.
+
+    For the other direction, we assume that the antichains are disjoint. We define $\varphi(t) = 0$ for $t\in A_0$, given $\varphi|_{\bigcup_{i\leq n}{A_i}}$ defined, for $t\in A_{n+1}$, let $$p_t = max(\{-1\}\cup \{\varphi(x)\mid x\sqsubseteq t\land x\in \bigcup_{i\leq n}A_i\})$$
+    $$q_t = min(\{1\}\cup \{\varphi(x)\mid t\sqsubseteq x\land x\in \bigcup_{i\leq n}A_i\})$$
+
+    Then let $\varphi(t) = \frac{q_t+p_t}{2}$
+\end{proof}
+
+\section{Cohen and Random Real}
+
+\subsection{Borel Codes}
+
+A Borel code can be viewed as a map from the Baire Space $\mathcal{N} = \mathbb{N}^\mathbb{N}$ to the Borel Sets on the reals. It describes the proceedure of constructing a Borel set.
+
+The way I think of Borels codes, they are names of certain roles Borel sets can play accross models. If we take a Borel set and naively take it to different models, it may be taken to be very different by different models. Let's say there is a ctm $M$ and an open interval $(a,b)^M$ in it, then $(a,b)^M$ would be a countable set in the true universe! Ideally, we would want the counterpart of $(a,b)^M$ in $V$ to be the set $(a,b)$, which `serves the same role' in $V$ as $(a,b)^M$ in $M$. The Borel code gives us a method of corresponding a Borel set in $M$ with the set in $V$ that plays the same role, in the sense that they are built up from the sets taken as rational intervals by different models in the same way.
+
+Fix the canonical bijection $\Gamma:\mathbb{N}\times \mathbb{N}\to \mathbb{N}$. For a $c\in \mathcal{N}$, let $u(c)\in \mathcal{N}$ be the `one step forward' of $c$: $$ u(c)(n) = c(n+1)$$ and $v_i(c)$ be the `one step forward' of $c$ combined with $\lambda x.\Gamma(i,x)$: $$v_i(c)(n) = c(\Gamma(i,n)+1)$$
+
+Then we say, for $\alpha<\aleph_1$ 
+
+\begin{center}
+
+
+\begin{tabular}{c l}
+    $c\in \Sigma_1$ & if $c(0)>1$ \\
+    $c\in \Pi_\alpha$ & if $c\in \bigcup_{\beta<\alpha}\Pi_\beta\cup \Sigma_\beta$, \\
+    & or $c(0) = 0$ and $u(c)\in \Sigma_\alpha$. \\
+    $c\in \Sigma_\alpha$ & if $c\in \bigcup_{\beta<\alpha}\Pi_\beta\cup \Sigma_\beta$, \\
+    & or $c(0) = 1$ and $v_i(c)\in \bigcup_{\beta<\alpha}(\Pi_\beta\cup \Sigma_\beta)$ for all $i$. 
+\end{tabular}
+    
+\end{center}
+
+    
+
+Then the set of Borel codes is $\bigcup_{\alpha<\aleph_1}\Sigma_\alpha$. 
+
+Fix an enumeration of rational intervals as $I_0,I_1,\dots$, let us decode $c\in BC$ in the following ways:
+
+\begin{center}
+
+
+\begin{tabular}{c l}
+    $c\in \Sigma_1$ & $A_c = \bigcup\{I_n\mid c(n+1) = 1\}$  \\
+    $c\in \Pi_\alpha$ and $c(0) = 0$ &  $A_c = \mathbb{R} - A_{u(c)}$. \\
+    $c\in \Sigma_\alpha$ and $c(0) = 1$ & $A_c = \bigcup_{i\in \omega}A_{v_i(c)}$
+\end{tabular}
+    
+\end{center}
+
+\begin{proposition}
+    $c\in \Sigma_\alpha$ iff $A_c\in \boldsymbol{\Sigma}_\alpha^0$ and $c\in \Pi_\alpha$ iff $A_c\in \boldsymbol{\Pi}_\alpha^0$
+\end{proposition}
+
+\begin{proof}
+    The only if is obvious. For the if side, we run an simultaneous induction.
+
+    Base case: For a $\boldsymbol{\Sigma}_1^0$ set(open set), it is a union of a family of basic opens, indexed by $I\subseteq \omega$. Hence a code that maps $0$ to 2 and $i+1$ to $1$ iff $i\in I$ is its code.
+
+    Induction step for successor. Let $A$ be $\boldsymbol{\Sigma}_{\alpha+1}^0$, then if $A$ is in $\boldsymbol{\Sigma}_{\alpha}^0\cup \boldsymbol{\Pi}_{\alpha}^0$, we are done. If not, then $A = \bigcup_{i\in \omega}A_{i}$ for $A_i\in (\boldsymbol{\Sigma}_\alpha^0\cup \boldsymbol{\Pi}_\alpha^0)$. By IH $A_i$ can be coded by $c_i$ and let $c$ be s.t. $v_i(c) = c_i$ and $c(0) = 1$.
+
+    For $A$ that is $\boldsymbol{\Pi}_{\alpha+1}^0$, $A = \mathbb{R} - B$ for some $B$ in $\boldsymbol{\Sigma}_{\alpha+1}^0$. Let $c_b$ code $B$, then $c(0) = 1$ and $c(n+1) = c_b(n)$ is a code for $A$.
+
+    The limit case is trivial.
+\end{proof}
+
+Moreover, I think by clever indexing, the Cantor set can also give the Borel code?
+
+
+\begin{lemma}[Lemma 25.44, 25.45 in Jech]
+    The set of all Borel Codes is $\boldsymbol{\Pi}^1_1$ (coanalytic).
+
+    $A_c\subseteq A_d$, $A_c = A_d$, $A_c = \emptyset$ are $\boldsymbol{\Pi}^1_1$ properties of Borel codes $c\in BC$
+\end{lemma}
+
+I plan to revisit the proof after reviewing descriptive set theory.
+
+Now recall the Shoenfield’s Absoluteness Theorem:
+
+\begin{theorem}
+    Each $\Sigma^1_2(a)$ relation and every $\Pi^1_2(a)$ relation are absolute for all model $M$ of $ZF+DC$ s.t. $a\in M$.
+\end{theorem}
+
+Hence for codes $c,d\in M$, $A_c^M = A_d^M$ iff $A_c = A_d$ etc. Moreover, the hierarchy of a code is absolute: ``$c\in \Sigma_\alpha$'' is an absolute statement given $\alpha$.
+
+Now we can show that set theoretic operations on Borel sets with codes
+in M are absolute for M.
+
+\begin{lemma}[Lemma 25.46 Jech]\label{lem:absolute}
+    For $c,d,e,$ and a sequence $(c_n,n\in \omega)\in M$, the the following relations for Borel codes are absolute for all transitive model $M$ of $ZF+DC$:
+
+    \begin{tabular}{ccc}
+        $A_e = A_d\cup A_c$ & $A_e = A_c\cap A_d$ & \\
+        $A_e = \mathbb{R} - A_c$ & $A_e = A_c\Delta A_d$ & $A_e= \bigcup_{i\in \omega}A_{c_i}$.
+    \end{tabular}
+\end{lemma}
+
+\begin{proof}
+    Consider the code $f$ where $v_i(f) = c_i$ and $f(0) = 1$. Then $$A_e^M = \bigcup_{i\in \omega}A_{c_i}^M\text{ iff }A_e^M = \bigcup_{i\in \omega}A_{v_i(f)}^M \text{ iff } A_e^M = A_f^M \text{ iff }A_e = A_f \text{ iff }A_e = \bigcup_{i\in \omega}A_{c_i}$$
+
+    Note here we uses the fact that the map $\Gamma$ is absolute and equality for codes are absolute.
+
+    Consider the code $f$ s.t. $u(f) = c$ and $f(0) = 0$. Hence $$A_e^M = \mathbb{R}^M - A_c^M \text{ iff }A_e^M = A_f^M \text{ iff } A_e = A_f \text{ iff } A_e = \mathbb{R}- A_c $$
+\end{proof}
+
+Remark: I think through out the section it is important to distinguish two perspective on the Borel sets. One is to take a Borel set as the set itself, the other is to view a Borel set as the place it occupies in the Borel Hierarchy (How it is constructed from rational intervals). A borel code codes the second perspective of a Borel set, and we've shown that given a Borel code in a transitive model of $ZF+DC$, the way it constructs Borel set from basic opens is absolute, though the resulting set is not, (nor is the basic opens themselves). The materials in the section focuses on the second perspective.
+
+
+\subsection{Random and Cohen Real}
+
+Random real and Cohen real means the real number added from forcing over $\mathcal{B}/I_n$ and $\mathcal{B}/I_m$ respectively. Here $I_n$ is the ideal of null sets and $I_m$ is the ideal of meager sets.
+
+But first, why is forcing over $\mathcal{B}/I_m$ called Cohen forcing? To simplify discussion, we assume here $\mathcal{B}$ is the Borel sets on the Baire space. Remember proposition \ref{prop:canonical-countable-atomless-forcing}, the standard forcing $Fn(\omega,2)$ to add a real is equivalent to forcing over $\omega^{<\omega}$. Now consider the following embedding \begin{align*}
+    \pi:  \omega^{<\omega} &\to (\mathcal{B}/I_m)^+\\
+    s &\mapsto [U_s = \{a\mid s\subseteq a\}]_m
+\end{align*}
+To show this is dense, for each Borel set $A$, since $A$ has Baire property, $A = U\Delta M$ for some open set $U$. Hence for some basic open $U_s$, $[U_s]_m\subseteq [A]_m$. Also, it is no hard to see then forcing over $Fn(\omega,2)$ is just forcing over the poset of all open sets.
+
+These two Boolean algebras are complete. For $\mathcal{B}/I_m$, and arbitrary family $\{[A_i]_m\mid i\in I\}$ of elements in it, the family can be written as $\{[U_i]_m\mid i\in I\}$ where $U_i$ are open since the Borel sets have the Baire property. Consider $\bigcup_{i\in I}U_i$, since for the real every open cover has a countable subcover (the real is Lindel\"of), $\bigcup_{i\in I}U_i = \bigcup_{n\in \omega}U_n$. Hence $\bigvee_{i\in I} [A_i]_{i\in I} = [\bigcup_{n\in \omega}U_n]_m$ which is of course an element of $\mathcal{B}/I_m$.
+
+For $\mathcal{B}/I_n$, we need the following lemma:
+
+\begin{lemma}[AC]
+    For a c.c.c. boolean algebra $\mathcal{B}$ (any uncountable family of nonzero elements has a pair of element whose meet is not zere), if it is also $\sigma$-complete, then $\mathcal{B}$ is complete.
+\end{lemma}
+
+\begin{proof}
+    Let $A\subseteq \mathcal{B}$, well order $A$ as $\{a_\alpha\mid \alpha<\kappa\}$, $\kappa = |B|$, we show that it has a join. 
+
+    First assume $\kappa = \aleph_1$, then we can modify $A$ to make it pairwise disjoint by: $$b_\alpha = a_\alpha - \bigvee_{\beta<\alpha}a_\beta$$
+    Then $\{b_\alpha\mid b_\alpha > 0\}$ forms an antichain in $\mathcal{B}$, hence by assumption it should be countable. Hence $\bigvee A = \bigvee \{b_\alpha\mid b_\alpha > 0\}$, which exists in $\mathcal{B}$.
+
+    Next we run an induction, suppose for all $\mu <\kappa$, we have established that every $\mu$ family has a join. If $\kappa$ is successor it is trivial. If $\kappa$ is limit, again for $\mu<\kappa$ consider $$b_\mu = a_\mu - \bigvee_{\beta<\mu}a_\beta$$
+    $\{b_\mu\mid b_\mu > 0\}$ forms an antichain and hence is countable. Consequently $\bigvee A = \bigvee \{b_\alpha\mid b_\alpha > 0\}$ exists.
+\end{proof}
+
+Then it suffice to show that $\mathcal{B}/I_n$ is c.c.c. For any antichain $\{[A_\alpha]_{null}\mid \alpha<\kappa\}$ in $\mathcal{B}/I_n$, for each $n,m\in \omega$, there is at most $n$ many elements $A_\alpha$ in the family s.t. $\mu(A_\alpha\cap (m,m+1]) \geq \frac{1}{n}$. Hence there are at most countably many elements in the family with positive measure on $(m,m+1]$, hence there are at most countably many elements in the family with positive measure on the real line. Hence the antichain is countable.
+
+\begin{lemma}[Lemma 26.1 in Jech]
+    \begin{enumerate}
+        \item If $c$ is $\Sigma^0_1$ or $\Pi^0_1$ code, then $\mu(A_c) = \mu^M(A_c^M)$.
+        \item ``$A_c$ is dense'', ``$A_c$ is nowhere dense'' is absolute for transitive models of $ZF+DC$.
+        \item ``$A_c$ is null/meagre'' are absolute for transitive models of $ZF+DC$.
+    \end{enumerate}
+\end{lemma}
+
+\begin{proof}
+    For the first bullet point, since $\Sigma_1$ code codes the $A_c = \bigcup_{n\mid c(n) = 1}I_n$, enumerate the indices s.t. $c(n) = 1$ as $n_0,n_1,\dots$, let $I_{m} = I_{n_m} - \bigcup_{k< m}I_{n_k}$ and hence $\mu(A_c) = \sum_{m\in \omega} \mu(I_{n_m}) = \sum_{m\in \omega} \mu^M(I_{n_m}^M) =  \mu^M(A_c^M)$. $\sum_{m\in \omega} \mu(I_{n_m}) = \sum_{m\in \omega} \mu^M(I_{n_m}^M)$.
+
+    Then for a $\Pi_1$ code $c$, $\mu(A_c) = \sigma_{m\in \mathbb{Z}}\mu([m,m+1] - A_c )= \sum_{m\in \mathbb{Z}}\mu([m,m+1] \cap A_{u(c)} ) = \sum_{m\in \mathbb{Z}}\mu^M([m,m+1]^M \cap A_{u(c)}^M ) = \mu^M(A_c^M)$
+
+    For the second bullet point, since $c_n$ where $c_n(n) = 1$ and is otherwise zero codes all basic opens, and intersection is absolute for Borel codes: $A_c\cap A_{c_n} = A_c^M\cap A_{c_n}^M$, hence ``$A_c$ is dense.'' is absolute.
+
+    For the third bullet, first for null sets,
+
+    $M\models A_c$ is null iff $$M\models \forall n\in \mathbb{N}\exists d\in BC(d\in \Sigma_1, A_d\supseteq A_c\text{ and }\mu(A_d)<\frac{1}{n})$$
+    The statement $d\in \Sigma_1, A_d\supseteq A_c\text{ and }\mu(A_c)<\frac{1}{n}$ is absolute and hence the whole statement lifts, hence $A_c$ is null in $V$.
+
+    $M\models A_c$ is not null iff $$M\models \exists d\in BC(d\in \Pi_1, A_d\subseteq A_c\text{ and }\mu(A_d)>0)$$
+    Similarly $d\in \Pi_1, A_d\subseteq A_c\text{ and }\mu(A_d)>0$ is absolute and the whole statement lifts, hence $A_c$ is not null in $V$.
+
+    Next for meagre sets, 
+
+    $M\models A_c$ is meagre iff there is a sequence $(c_n,n\in \omega)\in M$ s.t. $$M\models c_n\in \Pi_1, A_{c_n} \text{ is no where dense and } A_c\subseteq \bigcup_{n\in \omega}A_{c_n}.$$
+    Since the sequence is in $M$, it is in $V$ and the statement above is absolute, hence $V$ thinks $A_c$ is meagre.
+
+    If $M\models A_c$ is not meagre, then by Baire property of $A_c$, $A_c = A_u\Delta A_d$, where $A_u\neq \emptyset$ is open and $A_d$ is meagre. By the fact that symmetric difference is absolute for Borel codes, $V$ thinks $A_c$ is not meagre and the conclusion follows.
+
+    
+\end{proof}
+
+For each Borel set $B\in M$, we denote by $B^*$ as the Borel set in $V$ that shares a Borel code with $B$. Since identity for Borel codes is absolute, the function is well-defined and does not depend on specific choice of Borel code. Now observe that $B = B^*\cap M$, this can be proved by a transfinite induction on the hierachy of $B$.
+
+Now, we will show that both forcing over $\mathcal{B}/I_m$ and $\mathcal{B}/I_n$ adds a real, and the real it adds has a correspondence with the generic filter we are using.
+
+
+\begin{lemma}[Lemma 26.2 in Jech]
+    \begin{enumerate}
+        \item If $G$ is an $M$-generic ultrafilter over $\mathcal{B}/I_m$, then there is a unique real $x_G$ s.t. for all $B\in \mathcal{B}$, $$x_G\in B^* \textit{ iff }[B]_m\in G.$$
+        \item If $G$ is an $M$-generic ultrafilter over $\mathcal{B}/I_n$, then there is a unique real $x_G$ s.t. for all $B\in \mathcal{B}$, $$x_G\in B^* \textit{ iff }[B]_n\in G.$$
+    \end{enumerate}
+\end{lemma}
+
+The real $x$ in $V$ that $x = x_G$ for some $G$ $M$-generic over $\mathcal{B}/I_m$ is called \textit{Cohen} over $M$, and $x$ in $V$ that $x = x_G$ for some $G$ $M$-generic over $\mathcal{B}/I_n$ is called \textit{random} over $M$.
+
+I think this lemma should be understood as: If $G$ is an $M$-generic ultrafilter over $(\mathcal{B}/I_m)^M$, then there is a unique real $x_G$ s.t. for all $B\in \mathcal{B}^M$, $$x_G\in B^* \textit{ iff }([B]_m)^M\in G.$$
+
+Or equivalently, If $G$ is an $M$-generic ultrafilter over $(\mathcal{B}/I_m)^M$, then there is a unique real $x_G$ s.t. for all Borel code $c\in BC^M$, $$x_G\in A_c \textit{ iff }([A_c^M]_m)^M\in G.$$
+
+\begin{proof}
+    The same proof works for both bullet points.
+
+    First we show that such real would be unique. If both $x_G,y_G$ satisfies the condition and they are not equal, take $x_G<q<y_G $ and $q$ is rational, let $c$ be a code for $(q,+\infty)$, then precisely one of $[A_c]$ and $[\mathbb{R} - A_c]$ (computed in $M$), is in $G$. But this is a contradiction since $x_G\in A_c^*$ while $y_G\in \mathbb{R} - A_c^*$.
+
+    For existence, let $$x = sup\{q\mid q \in \mathbb{Q}, [(q,+\infty)^M]^M\in G\}$$
+
+    Notice $D = \{[B]^M\mid \exists q\in \mathbb{Q}, (q,+\infty)^M\cap B = \emptyset\} $ is dense, hence there is $q$ s.t. $[(q,+\infty)^M]^M\not\in G$ and the supremum exists. 
+
+    Next, we show by an induction on Borel codes that for all $c\in BC^M$, $$x_G\in A_c \textit{ iff }([A_c^M]_m)^M\in G.$$
+
+    First, for basic intervals, i.e. the code $c$ where exactly one indice in $1$. Let $A_c = (p,q)$
+    \begin{align}
+        x\in A_c &\text{ iff }p<sup\{q\mid q \in \mathbb{Q}, [(q,+\infty)^M]^M\in G\}<r \\
+        &\text{ iff } [(p,+\infty)^M]^M\in G, [(r,+\infty)^M]^M\not\in G \\
+        &\text{ iff } [(p,r)^M]^M\in G \\
+        & \text{ iff }[A_c^M]^M\in G
+    \end{align}
+    For $\Sigma_1$ codes, \begin{align}
+        x\in A_c &\text{ iff } x\in \bigcup_{n\mid c(n) = 1}I_{n}\\
+        &\text{ iff } \exists n, c(n) = 1\text{ and }x\in I_n  \\
+        &\text{ iff }  \exists n, c(n) = 1 \text{ and }[I_n^M]^M \in G \\
+        &\text{ iff } [\bigcup_{n\mid c(n) = 1}I_{n}^M]^M\in G \text{ iff }[A_c^M]^M\in G
+    \end{align}
+
+    The other cases are similar.
+\end{proof}
+
+\begin{theorem}[Lemma 26.4 of Jech]\label{thm:random-Cohen}
+=    A real $x$ is random over $M$ iff for all $c\in BC^M$ s.t. $A_c$ is null, $x\not\in A_c$ (computed in $V$). i.e. it is not in any null Borel set with a code in $M$.
+    
+    $x$ is Cohen over $M$ iff it is not in any meagre Borel set with a code in $M$.
+\end{theorem}
+
+\begin{proof}
+    Again we only show it for $\mathcal{B}/I_m$. One side is easy since $G$ generic over $\mathcal{B}/I_m$ can not contain any meagre Borel set in $M$.
+
+    For the order side, say $x$ is not in any meagre Borel set of $M$, consider $G = \{[A_c^M]^M\mid x\in A_c\}$. The set if well defined as if $A_c^M\Delta A_d^M$ is meagre in $M$, $A_c\Delta A_d$ is meagre in $V$ and the difference is coded in $M$, hence $x\not\in A_c\Delta A_d$, meaning $x\in A_c$ iff $x\in A_d$.
+
+    It is easy to see that $G$ is an ultrafilter. To show $G$ is $M$-generic, for any dense set $D\in M$, pick a maximal antichain $A$ in $D$ and by c.c.c. of $\mathcal{B}/I_m$, it is countable. Since $D$ is dense, $\bigvee A\in G$, then $$\bigvee A = [\bigcup_{n\in \mathbb{N}}B_n]^M$$and one of $[B_n]^M$ is in $G$.
+
+    Finally, $x_G = x$ by uniqueness.
+\end{proof}
+
+\subsection{Adding a Cohen Real adds a Suslin Line}
+
+
+
+\begin{lemma}
+    There is an $\omega_1$ family of functions $\{e_\alpha\mid \alpha<\omega_1\}$ s.t. 
+    \begin{enumerate}
+        \item $e_\alpha$ is one-to-one from $\alpha$ to $\omega$.
+        \item If $\alpha<\beta$, $e_\alpha(\xi) = e_\beta(\xi)$ for all but finitely many $\xi<\alpha$.
+    \end{enumerate}
+\end{lemma}
+
+\begin{proof}
+    First get a function $f:\omega\to \omega$ s.t. $\omega - ran(f)$ is infinite. Then let $e_n = f|_n$ and $e_\omega = f$.
+
+    Then recursively define $e_\alpha$ s.t. $\omega - ran(e_\alpha)$ is infinite and $e_\alpha$ satisfies 2. For the limit step for $\gamma$, let $\alpha_0,\alpha_1\dots$ be a sequence approaching $\gamma$, then let $e_\gamma$ be equal to $\bigcup_{i\in \omega}e_{\alpha_i}$ but avoids and infinite set from its range, it avoids one element from $e_{\alpha_1}$, two elements from $e_{\alpha_2}$ and so on.
+\end{proof}
+
+Given such a system of functions, $Level(\beta) = \{e_\alpha|_\beta\mid \beta<\alpha<\omega_1\}$ is an Aronszajn tree: it has no uncountable branch as all branches are $e_\alpha$, its height is $\omega_1$ and each level is at most countable by property 2.
+
+A sequence of function satisfying the condition in Lemma 26 is called a \textit{coherent sequence}.
+
+\begin{theorem}
+    If $r:\omega\to \omega$ is a Cohen real over $M$, then in $M[r]$, $$T_r = \{r\circ (e_\alpha|_\beta)\mid \alpha,\beta\in \omega_1\}$$ is a Suslin tree. Here $e_\alpha,\alpha\in \omega_1$ is a coherent sequence in $M$.
+\end{theorem}
+
+\begin{proof}
+    First we show that this tree has no uncountable anti-chain: If $r\circ (e_{\alpha_a})|_{\beta_a},a\in \tau_G$ is an uncountable antichain of $T_r$ in $M[r]$, we can assume $\tau_G\subseteq \omega_1^M$ then by Lemma \ref{lem:uncountable_subset} there is $A_0\in M$ s.t. $A_0\subseteq \tau_G$ and $M[G]$ thinks $r\circ (e_{\alpha_a})|_{\beta_a},a\in A_0$ forms an antichain.
+
+    We show that this is impossible by showing that for all condition $p$ in $Fn(\omega,\omega)$ there is $q\leq p$ s.t. $q$ thinks $\dot{r}\circ (e_{\alpha_a})|_{\beta_a}$ and $\dot{r}\circ (e_{\alpha_b})|_{\beta_b}$ are compatible.
+
+    Let $n = |p|$.  For each $\beta_a\in A_0$, let $X_b = \{\xi<\beta_b\mid  (e_{\alpha_b})|_{\beta_b}(\xi)<n \}$, this is finite and by Delta system lemma there should be finite $R$ and uncountable $B\subseteq A_0$ s.t. $a,b\in B$ entails $X_b\cap X_a = R$. Further more, since there are only $|S|^{n-1}$ many possible $S\to n-1$ functions, we may as well assume $(e_{\alpha_b})|_{\beta_b}|_S =  (e_{\alpha_a})|_{\beta_a}|_S$ for all $a,b\in B$. (this means as long as in the range of $p$, the two functions are equal.)
+
+    Then, we can construct $q$ s.t. $q\circ (e_{\alpha_a})|_{\beta_a} = q\circ (e_{\alpha_b})|_{\beta_b}$ (see the book) and we are done.
+
+    Then, notice each node in the tree has more than one immediate successors by a generic argument. This together with the fact that the tree has no uncountable anti chain entails that there is no uncountable branch.
+\end{proof}
+
+\begin{lemma}[Exiercise 28.3 of Jech]\label{lem:uncountable_subset}
+    If $\mathbb{P}$ is a countable forcing notion, then for each uncountable $X\subseteq \omega_1$ in $V[r]$, there is $Y\subseteq X$ that is uncountable in $V$.
+\end{lemma}
+
+
+\begin{proof}
+    Say $M[G]\models \tau \subseteq \omega_1, \tau$ is uncountable. Since the forcing condition is c.c.c., $\omega_1$ is the same in $V$ and $V[G]$. Let $A_q = \{\alpha\in \aleph_1\mid q\Vdash \alpha\in \tau\}$. Then each $A_q$ would be in $M$ by definability of $\Vdash$, notice $\bigcup_{q\in G}A_q = \tau_G$, working in $M[G]$, one of $A_q$ must be countable as $\mathbb{P}$ is countable in $M$, thus is $M[G]$. Hence we have $A_q\subseteq \tau_G$, is uncountable in $M$.
+
+\end{proof}
+
+\section{Solovay's Model}
+
+\subsection{Cardinal preservation in forcing}
+
+We know that if the forcing poset is c.c.c. in the ground model $M$, then the forcing preserves cardinal in the sense that $\alpha$ is a cardinal in $M$ iff $\alpha$ is a cardinal in $M[G]$. Here we generalize the result and show that if the forcing is $\kappa$-c.c. where $\kappa$ is a regular cardinal, then $\alpha$ preserves cardinal greater than $\kappa$.
+
+\begin{lemma}
+    If $\bbP\in M$ and is $\kappa$.c.c. in $M$, for $A,B\in M$ and $f\in B^A\cap M[G]$, then there is $F:A\to \mathcal{P}(B)$ s.t. $F\in M$ and for all $a\in A$, $f(a)\in F(a)$ and $(|F(a)|\leq \kappa)^M$.
+\end{lemma}
+
+\begin{proof}
+    Fix $p\in G$ s.t. $p\Vdash \dot{f}:\check{A}\to \check{B}$. Let $F$ be $$F(a) = \{b\in B\mid \exists q\leq p(p\Vdash \dot{f}(\check{a}) = \check{b})\}$$
+    Then $f(a)\in F(a)$ and $(|F(a)|\leq \kappa)^M$ as $\bbP$ is $\kappa$.c.c. in $M$. 
+\end{proof}
+
+\begin{theorem}[Lemma IV.7.7, Lemma IV.7.8, Theorem IV.7.9]\label{thm:c.c.c.-cardinality-preservation}
+    If the forcing poset $\mathbb{P}$ is $\kappa$-c.c. in $M$ and $M$ thinks $\kappa$ is a regular cardinal, 
+    \begin{enumerate}
+        \item For each limit $o(M)>\theta\geq \kappa$, if $M$ thinks $\theta$ is regular then $M[G]$ does.
+        \item For $o(M)>\theta$ s.t. $cf(\theta) \geq \kappa$, $cf^M(\theta) = cf^{M[G]}(\theta)$.
+        \item For $o(M)>\theta\geq \kappa$, $M$ thinks $\theta$ is a cardinal iff $M[G]$ thinks so. 
+    \end{enumerate}
+\end{theorem}
+
+\begin{proof}
+    For the first bullet point, suppose $\theta$ is singular in $M[G]$, then there is $f:\alpha\to \theta$, $|\alpha|<\theta$ s.t. $\bigcup ran(f) = \kappa$, hence by the previous Lemma, there is an approximation $F: \alpha\to \mathcal{\kappa}$ in $M$, then consider the map $g: \alpha\to \kappa$, $\gamma \mapsto\bigcup F(\alpha)$, if $g(\gamma) = \theta$ then $\theta$ is of course singular. If not, change the order of the map $g$ so that it is increasing, then $\bigcup ran(f) = \kappa $, hence $\kappa$ is singular in $M$.
+
+    For the second bullet point, 
+
+    The third point is true since every cardinal above $\kappa$ is either regular or a limit of cardinals above $\kappa$.
+\end{proof}
+
+The proof is essentially the same for c.c.c., see Lemma IV.3.5 and Theorem IV.3.4 in Kunen.
+
+We now show that a poset of the form $Fn_\lambda(I,J) = \{p\mid |p|<\lambda\text{ is a partial function from }I \text{ to }J\}$. This uses the general Delta System Lemma \ref{Lem:Delta-system}.
+
+
+
+\begin{lemma}
+    For infinite $\lambda$, $Fn_\lambda(I,J)$ has  $(|J|^{<\lambda})^+$-c.c.
+\end{lemma}
+
+$\kappa$-c.c. conditions also give upper bounds for powers, by a nice name argument.
+
+\begin{lemma}\label{lem:nice-name-counting}
+    Let $\bbP$ be a $\kappa$-c.c. and for given $\lambda$, $$1\Vdash 2^\lambda \leq (|\bbP|^{<\kappa})^{\lambda}$$
+\end{lemma}
+
+\begin{proof}
+    First, for a name of size $\lambda$, since there are at most $|\bbP|^{<\kappa}$ many antichains, there are no more than $(|\bbP|^{<\kappa})^\lambda$ nice names for subsets of $\tau$. Let $\delta = (|\bbP|^{<\kappa})^\lambda$.
+    
+    The name $\check{\lambda}$ has size $\lambda$, list all nice names for subsets of $\lambda$ as $N = \{\theta_\xi\mid \xi<\delta\}$. For each $X\subseteq \lambda$ in $M[G]$ ($M[G]$ is arbitrary), $X$ has a nice name and hence $ \mathcal{P}(\lambda)\subseteq N$, hence $2^\lambda \leq \delta$ in $M[G]$
+\end{proof}
+
+Moreover, we collect some consequences of cardinal preservation for cadinals $\leq\lambda$.
+
+\begin{lemma}[Lemma IV.7.12 of Kunen, Lemma IV.7.15]
+    If for $\omega< \lambda<o(M)$ and all $\delta<\lambda$, $\lambda^\delta\cap M= \lambda^\delta \cap M[G]$, then $cf^M(\gamma) = cf^{M[g]}(\gamma)$ for all $\gamma\leq \lambda$. 
+
+    In particular, if a forcing poset $\bbP$ is $\lambda$ closed in the sense that for every decreasing sequence in $\bbP$ of length less than $\lambda$, there is an element less than every element in the sequence, then $\bbP$ preserves cardinals less or equal than $\lambda$.
+\end{lemma}
+
+\begin{proof}
+    The first statement is obvious, to show that $\lambda$-closed entails the condition, if $f: \delta\to \lambda\in M[G]$, recursively choose forcing conditions $p_\alpha$ s.t. $p_\alpha\Vdash \dot{f}(\alpha) = \xi_\alpha$ and $p_\alpha<p_\beta$ if $\alpha<\beta$. Then there is $p$ less than all those conditions and $p\Vdash \dot{f} = h$ where $h(\alpha) = \xi_\alpha$, this shows $f = h\in M$.
+\end{proof}
+
+
+
+
+
+\subsection{Levy's Collapse}
+
+Consider the following forcing poset $Fn(\omega,\lambda)$, forcing over this poset adds a surjective function from $\omega$ to $\lambda$, thus collapsing $\lambda$ to a countable ordinal. At the mean time, it preserves cardinals greater than $(\lambda^+)^M$. It turns out that $Fn(\omega,\lambda)$ is, under forcing equivalent, the only poset that collapses $\lambda$ to a countable ordinal.
+
+\begin{lemma}[Lemma 26.7 in Jech]
+    If $\bbQ$ is a poset s.t. $|\bbQ| = \lambda$ in $M$ and $Q$ collapses $\lambda$ to a countable ordinal, i.e. $1_\bbQ\Vdash \check{\lambda}$ is countable, then $Fn(\omega,\lambda)$ densely embedds into $\bbQ$.
+\end{lemma}
+
+\begin{proof}
+    Without loss of generality, let $\bbQ$ be separative.
+    Let $\dot{G} = \{(\check{q},q)\mid q\in \bbQ\}$, the canonical name of the generic filter on $\bbQ$. Then $1_\bbQ\Vdash \exists \dot{f} \text{ that is surjective from }\check{\omega}\to \dot{G}$, this is because in every forcing extension, $\bbQ$, and in turn $G$ is countable.
+
+    We construct the following map $\pi: Fn(\omega,\lambda)\to Q$ in $M$ recursively. The following argument is completely in $M$. We map $\emptyset$ to $1$ and for $p$ of length $n$ defined, we define $p\widehat{\phantom{x}}(n, \xi)$ to be mapped as the following: Let $$W_p = \{q_\xi\mid \xi<\lambda \}$$ be a maximal antichain with the following property: for each, $q_\xi\Vdash \dot{f}(n) = \check{q_\xi}$.
+
+    An antichain maximal w.r.t. this condition must be of cardinality $\lambda$, it of course can't be greater than $\lambda$. To show that it is of cardinality $\lambda$, notice $\pi(p)$ forces $\check{\lambda}$ is countable. Hence $\pi(p)$ forces $\check{\lambda}_{\pi(p)}$ is countable, where $\check{\lambda}_{\pi(p)}$ is $\check{\lambda}$ with all occurence of $1$ in the name changed to $\pi(p)$. This means $\pi(p)\downarrow$, considered as a subposet of $\bbQ$, forces $\check{\lambda}$ is countable and thus can't be of $\lambda$ chain condition. Given any antichain of length $\lambda$, we can then find further elements that determines $\dot{f}(n)$.
+    
+    Then $\pi$ is certainly a complete embedding into $Q$. To show it is also dense, for $q\in \bbQ$, $q\Vdash q\in \dot{G}$ and hence $q\Vdash q\in ran(\dot{f})$. This means that there is $r\leq q$, $n\in \omega$ s.t. $r\Vdash f(n) = q$. Take $p\in Fn(\omega,\lambda)$ s.t. $\pi(p)$ is compatible with $q$ and $|p| = n+1$ (since levels of $\pi[Fn(\omega,\lambda)]$ is an antichain.) By construction $\pi(p)\Vdash \dot{f}(n) = q_\xi$ where $p(n) = \xi$. This means $\pi(p)\Vdash \dot{f}(n) = q$, hence $\pi(p)\Vdash q\in \dot{G}$. As $\bbQ$ is separative, this entails that $\pi(p)\leq q$ and this completes the proof.
+\end{proof}
+
+Remark: Considering the subposet of the whole poset and showing that $\bbQ$ has an antichain of $\lambda$ under any element is a typical argument. In a sense, it shows that $\bbQ$ is quite homogeneous. 
+
+Let $\kappa$ be an inaccessible cardinal (Both weak inaccessible and strong inaccessible are ok, since they have the same consistency strength.) L\'evy collapse is the forcing poset $\prod^{fin}_{\lambda<\kappa}Fn(\omega, \lambda)$, or equivalently, $$Col(\aleph_0,<\kappa) = \{p\text{ is finite function with domain }\kappa \times \omega\mid p(\lambda,n)<\lambda\}$$
+
+The function 
+$\pi: Col(\aleph_0,<\kappa)\to \prod^{fin}_{\lambda<\kappa}Fn(\omega, \lambda)$ that maps $p$ to the function that maps $\lambda\not\in dom(p)$ to $\emptyset$, and $\lambda\in dom(p)$ to the partial function $p(\lambda)$ is an isomorphism.
+
+\begin{lemma}
+    Forcing over $\prod^{fin}_{\lambda<\kappa}Fn(\omega, \lambda)$ preserves cardinality greater or equal than $\kappa$, and collapses every cardinal below $\kappa$ to $\omega$. Hence $\kappa = \omega_1^{M[G]}$.
+\end{lemma}
+
+\begin{proof}
+    We show that $Col(\omega,<\kappa)$ has the $\kappa$-c.c. condition, given a $\kappa$ sized collection of conditions $P = (p_\alpha\mid \alpha<\kappa)$, by the Delta System Lemma \ref{Lem:Delta-system}: there is $X \in [P]^\kappa$ s.t. for each $p_\beta\neq p_\gamma\in X$, their support is $R\subseteq \kappa\times \omega$. By another application of Delta System Lemma, we can get $Y\in [X]^\kappa$ s.t. any elements in $Y$ agrees on the shared support, then these conditions would be compatible.
+
+    Finally, for an generic filter $G$ over $\prod^{fin}_{\lambda<\kappa}Fn(\omega, \lambda)$, $\bigcup G(\lambda,-)$ would be a surjective function from $\omega$ to $\lambda$, thus collapsing $\lambda$.
+\end{proof}
+
+Next, we introduce the factor lemma for Levy collapse. We first introduce the following notation, for $M$ and a generic extension $M[G]$ of $M$ and $x\in M[G]$, we denote by $M[x]$ the smallest extension of $M$ that contains $x$. It is a well defined notion and we show that it is actually a generic extension.
+
+
+\begin{lemma}[Exercise 13.34 in Jech]
+    If $M$ is an inner model of $ZF$ and $X\subseteq M$, then there is a smallest extension of $M$, $M[X]\models ZF$ that contains $X$. Moreover, if $M$ satisfies $AC$, then $M[X]$ does.
+\end{lemma}
+
+\begin{proof}
+    Consider $N = M\cup L(X)$ and $L[N]$, then $L[N]\supseteq M\cup \{X\}$. This is the smallest inner model that contains a set $X$ and extends $M$. (Indeed, this part of the proof does not rely on $X\subseteq M$.)
+
+    If $M\models AC$, then there is a (class) well order of $M\cup \{X\}$ that is definable in $M$, then there is a well order of $L[N]$.
+\end{proof}
+
+A remark: If $M$ is a set model, the proof of this exercise is easy (and is actually all we need for our purpose): Fix $H_\theta$ large enough to contain $M\cup tcl\{X\}$, then use L\"owenheim Skolem theorem and transitive collapse to get such a model. But for inner class, things are not that simple as L\"owenheim Skolem theorem, which relies on truth predicate, does not hold for inner models in general. A line worth noticing is that by the following stack exchange link\footnote{https://mathoverflow.net/questions/61447/is-this-a-proper-application-of-the-lowenheim-skolem-theorem-to-a-proper-class}, $0^\#$ gives a truth predicate for $L$, which seems very interesting.
+
+\begin{lemma}[Lemma 15.43 in Jech]\label{lem:general-factorize}
+    If $G$ is generic over $\bbP$, and $N$ is a model of ZFC s.t. $M\subseteq N\subseteq M[G]$, then there is $\bbQ_1$ s.t. $N = M[H]$ for some $H$ generic over $\bbQ_1$, and $\bbQ_2\in M[H]$ and $K$ generic over $M[H]$ s.t. $\bbQ_1 *\dot{\bbQ_2} = \bbP$ and $H*K = G$. This entails that $M[H][K] = M[G]$.
+\end{lemma}
+
+This lemma states that every intermediate model between the ground model and a generic extension is indeed a generic extension, and it is somehow given by a factored poset $\bbQ_1$ with a remainder $\bbQ_2$. The lemma is more easily proved in the language of Boolean algebras, we prove it in the appendix \ref{App:factorize}.
+
+The above two lemmas show that the notion $M[X]$ is well defined for ctm $M$ if $X\in M[G]$, and it is always a generic extension indeed: We work in $M[G]$ and apply the extension $M[X]$ of $M$ that contains $X$ and is the smallest such model. Then viewing from the universe, the factorization in \ref{lem:general-factorize} applies.
+
+The remarkable fact of L\'evy collapse is that different from Lemma \ref{lem:general-factorize}, where the remainder poset $\bbQ_2$ may vary based on what $X$ is, L\'evy collapse is robust in the sense that if $X$ is countable, then the remainder poset is always L\'evy collapse itself. This is because $\kappa$ is inaccessible, and this fact together the following Corollary would be important in the following proof.
+
+\begin{lemma}[Corollary in Jech 26.10]
+    If $G$ is a $M$-generic filter on $Fn(\omega,\lambda)$ and let $X$ be a set of ordinals in $M[G]$, then either $M[X] = M[G]$ or ther is a $M[X]$-generic filter $H$ on $Fn(\omega,\lambda)$ s.t. $M[X][H] = M[G]$.
+\end{lemma}
+
+\begin{proof}
+    First by an minimality argument, $M[X]\subseteq M[G]$. 
+    If $\lambda$ is countable in $M[X]$, then $Fn(\omega,\lambda)$ is an countable atomless forcing poset in $M[X]$, and hence forcing over arbitrary countable atomless forcing poset in $M[X]$ gives $M[G]$. This is because every countable atomless poset is forcing equivalent. For $H$ generic over the countable atomless forcing poset, $H\in M[G]$ and $G\in M[X][H]$. By minimality argument they are equal.
+
+    If $\lambda$ is uncountable in $M[X]$, then consider the poset $Fn(\omega, |\lambda|^{M[X]})$ in $M[X]$, it is isomorphic to $Fn(\omega,\lambda)$ in $M[X]$. Hence forcing over it with filter $\pi^{-1}[G]$ where $\pi$ is the isomorphism between the two posets creates $M[X][H] = M[G]$.
+\end{proof}
+
+
+\begin{corollary}[The Factor Lemma, Corollary 26.11 in Jech] \label{cor:factorize-1}
+    Let $G$ be a generic filter on $\prod^{fin}_{\lambda<\kappa}Fn(\omega, \lambda)$, if $X$ is a countable set of ordinals in $M[G]$, then there is a $M[G]$ generic filter $H$ on $\prod^{fin}_{\lambda<\kappa}Fn(\omega, \lambda)$ s.t. $M[X][H] = M[G]$.
+\end{corollary}
+
+\begin{proof}
+    Let $\bbP_\mu = \prod^{fin}_{\lambda<\mu}Fn(\omega, \lambda)$ and $\bbP^\mu = \prod^{fin}_{\mu<\lambda}Fn(\omega, \lambda)$. Then $\bbP_\mu \times \bbP^\mu = \prod^{fin}_{\lambda<\kappa}Fn(\omega, \lambda)$. 
+
+    Since $X$ is countable in $M[G]$, consider $\lambda = sup X<\kappa$, let $\tau$ be a nice name of $X$, subset to $\check{\lambda}$. Then $\tau$ contains only countably many forcing notions from the perspective of $M[G]$, hence there is $\mu<\kappa$ s.t. $\tau$ can be viewed as a $\bbP_\mu$ name.
+    
+    Let $G = G_\mu * G^\mu$ where $*$ is the operation given by Theorem \ref{thm:two-step-iteration}. 
+    Hence $X\in M[G_\mu]$. By Corollary \ref{cor:factorize-1}, there is $M[G_\mu]$ generic filter $H$ over $\bbP_{\mu+1}$ s.t. $M[ G_\mu] = M[X][H]$. Hence $M[G] = M[G_\mu][G^\mu] = M[X][H][G^\mu]$ by Theorem \ref{thm:two-step-iteration}, hence let $K = H* G^\mu$ and $M[G] = M[X][K]$.
+\end{proof}
+
+\begin{corollary}\label{cor:kappa-is-inaccessible}
+    Let $G$ be a generic filter on $\prod^{fin}_{\lambda<\kappa}Fn(\omega, \lambda)$, if $X$ is a countable set of ordinals in $M[G]$, then $\kappa$ is still inaccessible in $M[X]$.
+\end{corollary}
+
+\begin{proof}
+    $\kappa$ is regular since as a $\kappa$.c.c. poset, L\'evy collapse preserves regularity for $\kappa$. To show that $\kappa$ is a strong limit, we notice by the proof of the previous corollary, $M[X]$ is an extension of $M$ over a poset $|\bbP_\mu|<\kappa$. Now by the nice name counting argument of Lemma \ref{lem:nice-name-counting}, for $\delta<\kappa$, $2^\delta \leq (|\bbP_\mu|^{|\bbP_\mu|})^{\delta}<\kappa$.
+\end{proof}
+
+Next we show the homogeneity of L\'evy collapse.
+
+\begin{theorem}[Homogeneity of L\'evy collapse, Proposition 10.19 in Kanamori]
+     $\bbP = \prod^{fin}_{\lambda<\kappa}Fn(\omega,\lambda)$ is weakly homogeneous, in the sense that for all $p$ and $q$ in the poset, there is an automorphism $i$ of $\bbP$ s.t. $i(p)$ and $q$ have a common extension.
+\end{theorem}
+
+\begin{proof}
+    Let $S\subseteq \kappa$ be the common support of $p,q$, then for $\pi_\lambda$ where $\lambda\in S$ a bijection on $\lambda$, these bijections collectively determine an automorphism of $\bbP$. We can tailor bijection $\pi_\lambda$ to make $i(p)$, $q$ have a common extension..
+\end{proof}
+
+\subsection{Solovay's Model}
+
+Recall that a set $X$ is ordinal definable over $A$ iff for some $\vec{\alpha}$, a finite sequence of ordinals and $\vec{a}$, a finite sequence of $A$ elements, $$X = \{u\mid \varphi(u,\vec{\alpha},\vec{a},A)\}$$
+
+
+Let $HOD(A)$ be the class of all ordinal definable sets over $A$. Even this property does not prima facie seems definable from $V$, it indeed is. Moreover, $HOD(A)$ is an inner model of $ZF$. (see Ch.13 of Jech)
+
+\begin{theorem}[Solovay, Theorem 26.14 in Jech]
+    Let $\kappa$ be an (strongly) inaccessible cardinal, $G$ be $M$ generic over $\prod^{fin}_{\lambda<\kappa}Fn(\lambda,\kappa)$, then let $N = HOD(Ord^{\omega})^{M[G]}$,\begin{enumerate}
+        \item $M[G]$ is a model of $ZFC$ where all projective sets of reals is Lebesgue measurable, has the Baire property and the perfect set property.
+        \item $N$ is a model of $ZF+DC$ where all sets of reals is Lebesgue measurable, has the Baire property and the perfect set property.
+        \item $L(\mathbb{R})^{M[G]}$ is a model of $ZF+DC$ where all sets of reals is Lebesgue measurable, has the Baire property and the perfect set property.
+    \end{enumerate}
+\end{theorem}
+
+I collected the last bullet point from Kanamori, it can be shown that if we force over $L$ in the original model, then $N$ and $L(\mathbb{R})^{M[G]}$ are the same.
+
+The basic idea of the proof goes the following, our main aim is to show that every set of real definable from a sequence of ordinals would have the regularity properties. Then by the fact that every projective set is definable from a sequence of the ordinal, we obtain the first bullet point. The following two bullet points follow from some absoluteness argument. 
+
+To show that every set of real definable from a sequence of ordinals has the regularity properties in $M[G]$, we show that 
+
+1) (Lemma \ref{lem:Solovay-set}): If a set of reals $X$ is definable from a sequence of ordinals $s$ in $M[G]$, then there is a formula s.t. $$M[s][x]\models \varphi(x) \iff x\in X$$
+
+2) (Lemma \ref{lem:41}): If $s\in M[G]$ is an infinite sequence of ordinals, the set of all reals in $M[G]$ not random over $M[s]$ is null; the set of all reals in $M[G]$ not Cohen over $M[s]$ is meagre.
+
+It turns out that given (2), every set of reals with the property in (1) will have the regularity properties. 
+
+Now we start with showing that every projective set is definable from a sequence of ordinals. 
+
+\begin{lemma}[(Part of) Lemma 25.25 in Jech]
+    If $A\subseteq \omega^\omega$ is $\boldsymbol{\Sigma}^1_2$ then it is $\Sigma_1$ with parameters from $HC$ in the L\'evy Hierachy.
+\end{lemma}
+
+\begin{proof}
+    \textcolor{red}{I still don't understand} 
+\end{proof}
+
+
+
+
+
+
+
+\textcolor{red}{Question: Why is every projective set definable from a sequence of the ordinal? }
+
+First we show that $N$ is a model of dependent choice. Remember that:
+
+(DC) If $R$ is a relation on $X$ s.t. for all $x\in X$ there is $y\in X$ s.t. $xRy$, then there is a sequence s.t. $s_nRs_{n+1}$.
+
+\begin{lemma}[Lemma 26.15 in Jech]
+    $N\models DC$
+\end{lemma}
+
+\begin{proof}
+    The key is to show that if $f:\omega\to N$ is in $M[G]$, then $f\in N$. This is true as $f$ can be coded by a sequence of ordinals and the canonical map from $\mathbb{N}^2$ to $\mathbb{N}$.
+\end{proof}
+
+\begin{lemma}[Lemma 26.16 in Jech]\label{lem:41}
+    Let $s\in M[G]$ be an infinite sequence of ordinals, then the set of reals not random over $M[s]$ is null; and the set of reals not Cohen over $M[s]$ is meager.
+\end{lemma}
+
+\begin{proof}
+    If a real $x$ is random over $M[s]$, then by Theorem \ref{thm:random-Cohen}, it is not in any null Borel set coded in $M[s]$. Hence the set of reals not random over $M[s]$ is contained in the union of all null Borel set coded in $M[s]$. 
+
+    By Corollary \ref{cor:kappa-is-inaccessible}, $\kappa$ is still inaccessible in $M[s]$. This means that the reals in $M[s]$ is countable in $M[G]$. This means that there are only countably many Borel codes that could code null sets in $M[s]$, judging from $M[G]$. Hence the union of all null Borel set coded in $M[s]$. 
+    
+    The case for Cohen sets is similar.
+\end{proof}
+
+The conclusion that all sets in the model $N$ is Lesbegue measurable is established by the following notion:
+
+\begin{definition}
+    We say a set $S$ of reals is \textbf{Solovay} over $M$ if there is a formula $\varphi(x)$, using parameters in $M$ s.t. $$x\in S\textit{ iff }M[x]\models \varphi(x)$$
+\end{definition}
+
+\begin{lemma}[Lemma 26.5 in Jech]\label{lem:Cohen/meagre}
+    Let $S$ be a Solovay set over reals over $M$, then there is Borel set $A,B$ s.t. $$S\cap R(M) = A\cap R(M), S\cap C(M) = B\cap C(M)$$
+    Here $R(M),C(M)$ denotes the random and Cohen reals over $M$, respectively.
+\end{lemma}
+
+\begin{proof}
+    We prove the statement for random reals. 
+    Let $\varphi(x)$ be such that $$x\in S\textit{ iff }M[x]\models \varphi(x)$$
+    Let $\dot{G},\dot{a}$ be the canonical name for the generic filter over $\mathcal{B}_n^+$ and the random real ($\dot{a}$ is the intersection of $\dot{G}$).
+
+    Let $A = \bigvee\{p\in \mathcal{B}_n^+\mid p\Vdash \varphi(\dot{a})\}$.
+
+    Then for $x\in S$ that is random, there will be $G$ generic over $\mathcal{B}_n^+$ s.t. $x = \dot{a}_G$.
+
+    Hence $$x\in S\iff M[x]\models \varphi(x) \iff M[G]\models \varphi(x)\iff  \text{there is }p\in G, p\Vdash \varphi(\dot{a})\iff [A]\in G\iff x\in A^*$$
+\end{proof}
+
+\begin{corollary}[Corollary 26.6 in Jech]\label{cor:Baire-Lebesgue} Let $S$ be a Solovay set of reals over $M$.
+    \begin{enumerate}
+        \item If the set of all reals that are not random over $M$ is null, then $S$ is Lebesgue measurable.
+        \item If the set of all reals that are not Cohen over $M$ is meager, then $S$ is Baire.
+    \end{enumerate}
+\end{corollary}
+
+\begin{proof}
+    Let $A$ be a Borel set given s.t. $S\cap R(M) = A\cap R(M)$, then $S\Delta A\subseteq \mathbb{R} - R(M)$ is null. Hence $S$ is Lebesgue measurable.
+\end{proof}
+
+\begin{lemma}[Lemma 26.16 in Jech]\label{lem:Solovay-set}
+    Let $G$ be generic over the L\'evy Collapse, if $X\in M[G]$ us a set of reals that is definable in $M[G]$ from a sequence of ordinals, then $S$ is Solovay over $M[s]$.
+\end{lemma}
+
+\begin{proof}
+    We first show that for any sequence of ordinals $x$, and any formula $\varphi$, there is $\tilde{\varphi}$ s.t. $$M[G]\models \varphi(x)\iff M[x]\models \tilde{\varphi}(x)$$
+
+    Consider the formula $1_\bbP\Vdash \varphi(\check{x})$, expressible in $M[x]$. Where $\bbP$ is the L\'evy Collapse. By the Factor Lemma, there is $H$ generic over $\bbP$ s.t. $M[x][H] = M[G]$. Then by the homogeneity of L\'evy collapse: $$M[x]\models \tilde{\varphi}(x)\iff M[x][H]\models \varphi(x)\iff M[G]\models \varphi(x)$$
+
+    Then, for a set of reals $X = \{u\in M[G]\mid\varphi^{M[G]}(r,s) \}$.
+
+    $$x\in X\iff M[G]\models \varphi(x,s)\iff M[s][x]\models \tilde{\varphi}(x,s)$$
+\end{proof}
+
+\begin{corollary}[Corollary 26.18 in Jech]
+    In $M[G]$ every set of reals definable from a sequence of ordinals has the property of Baire and is Lebesgue measurable.
+\end{corollary}
+
+\begin{proof}
+    Apply the previous Lemma \ref{lem:41}, \ref{lem:Solovay-set} and Corollary \ref{cor:Baire-Lebesgue}.
+\end{proof}
+
+\begin{corollary}[Corollary 26.19 in Jech]
+    In $N$, every set of reals has the property of Baire and is Lebesgue measurable.
+\end{corollary}
+
+\begin{proof}
+    Since every real in $M[G]$ can be viewed as a sequence of natural numbers, $M[G]$ and $N$ shares the same reals. Hence they share the same Borel codes, for a Borel code $c\in M[G]$, $A_c^{M[G]} = A_c^{M[G]}\cap N = A_c^N$.
+
+    If $X\in N$ is a set of reals, then $X$ is definable in $M[G]$ from a sequence of ordinals, hence $M[G]\models X\Delta A$  is null and $X\Delta B$ is meagre for some Borel sets $A,B$, as $X$ has Baire property and is Lebesgue measurable. Since null and meagre are absolute properties for model of $ZF+DC$ (Lemma \ref{lem:absolute}), we have that $N$ thinks so, and hence $N$ thinks $X$ has Baire property and is Lebesgue measurable.
+\end{proof}
+
+To conclude the proof of Solovay's theorem, we show that each set of reals definable from a sequence of ordinals has perfect set properties.
+
+For $A$ an uncountable subset of the reals $\omega^\omega$ definable from sequence $s$ in $M[G]$, let $$x\in A\iff M[G]\models \varphi(x,s)\iff M[s][x]\models \tilde{\varphi}(x,s)$$
+
+$M[s]\cap \omega^\omega$ would be countable from the perspective of $M[G]$. Hence there is $y\in A - (\omega^\omega)^{M[s]}$. By the factor lemma, let $\bbQ\in M[s]$ be the forcing poset and $H$ be the generic filter s.t. $M[s][y] = M[s][H]$.
+
+Hence there is $p\in G$ and name $\dot{y}$ s.t. $$p\Vdash_\bbQ  \dot{y}\in \omega^{\omega} - M[s]\land M[s][\dot{y]}\models \tilde{\varphi}(y,s)$$
+$\mathcal{P}(\bbQ)$ is also countable in $M[G]$, we enumerate the dense sets in $\bbQ$ as $D_0,D_1\dots$.
+
+For $t\in 2^{<\omega}$, we inductively define $p_t$ where for $p_t$ defined, we let $p_{p\widehat{\phantom{x}}0},p_{p\widehat{\phantom{x}}1}$ be as follows: there is $n\geq len(t)$ s.t. $p_t$ does not decide $\dot{y}(n)$, otherwise $p_t$ knows everything about $\dot{y}$, $p_t\Vdash \dot{y}\in M[s]$ and this contradicts $p\Vdash \dot{y}\not\in M[s]$. Let $p_{p\widehat{\phantom{x}}0},p_{p\widehat{\phantom{x}}1}$ be in $D_{n+1}$ and think $\dot{y}$ to be different. 
+
+For each $x\in 2^\omega$, consider the filter $G_x = \{q\in \bbQ\mid q\geq p_t\text{ for some }t\subseteq x\}$. By design $G_x$ is generic over $M[s]$.
+
+We show that $C = \{\dot{y}_{G_x}\mid x\in 2^\omega\}$ is a perfect set in $A$. Consider the map $f: x\mapsto \dot{y}_{G_x}$, it is clearly injective, it is continuous as for basic open $U_t\subseteq A$, its reflection is open in $2^\omega$. Hence $C = f[2^\omega]$ is perfect.
+
+Finally, we remark that $L(\mathbb{R})$ is also a model of the regularities of the reals of DC (bullet point 3 in the theorem). The proof that in $L(\mathbb{R})^{M[G]}$ the properties hold is the same as the previous corollary as $L(\mathbb{R})^{M[G]}$ shares the same Borel sets as$M[G]$. 
+
+
+
+% Recall that a complete subalgebra $\mathcal{C}\subseteq \mathcal{B}$ is a subalgebra s.t. for every $C\subseteq \mathcal{C}$, $\bigvee_\mathcal{B}C\in \mathcal{C}$. Then it is necessary that for each $C\subseteq \mathcal{C}$ s.t. $\bigvee_\mathcal{B}C$ exists, $\bigvee_\mathcal{B} C = \bigvee_\mathcal{C}C$. Notice this does not mean that $\mathcal{C}$ is dense in $\mathcal{B}$.
+
+% \begin{lemma}
+%     If $\bbP$ is a complete boolean algebra and $\bbQ$ is a complete sub poset of $\bbP$, then if $|\bbP| = \lambda$ and $|\bbQ|<\lambda$, and $e:\bbQ\to Fn(\omega,\lambda)$ is an embedding, then there is embedding $e':\bbP\to Fn(\omega,\lambda)$ extending $e$.
+% \end{lemma}
+
+% \begin{lemma}
+%     If $\mathcal{B}$ is a complete boolean algebra and $\mathcal{C}$ is a complete subalgebra of $\mathcal{B}$, then if $|\mathcal{B}| = \lambda$ and $|\mathcal{C}|<\lambda$, and $e:\mathcal{C}\to C(Fn(\omega,\lambda))$ is an embedding, then there is embedding $e':\mathcal{B}\to C(Fn(\omega,\lambda))$ extending $e$.
+% \end{lemma}
+
+% \begin{theorem}[Homogeneity of L\'evy collapse, Theorem 26.12 in Jech]
+%     For isomorphic complete subposets $\bbQ,\bbQ'$ of $\bbP = \prod^{fin}_{\lambda<\kappa}Fn(\omega, \lambda)$ s.t. their cardinality is less than $\kappa$, and $\pi_0$ is an isomorphism between $\bbQ,\bbQ'$, then there is an automorphism of $\prod^{fin}_{\lambda<\kappa}Fn(\omega, \lambda)$ extending $\pi$.
+% \end{theorem}
+
+% \begin{proof}
+%     We construct the following sequence of sub posets:
+
+%     Let $\bbQ_0 = \bbQ$, $\bbQ'_0 = \bbQ'$. Since $|\bbQ'|<\lambda$, the nonempty part of the functions in $p\in \bbQ'$ is bounded by some $\mu<\kappa$. Hence there is $\mu$ s.t. $\bbQ'\subseteq_c \bbP_\mu$. Let $\bbQ'_1 = \bbP_\mu$, then by the previous lemma, the embedding $i_0: \bbQ'\to \bbP$ can be extended 
+% \end{proof}
+
+\section{Appendix A: Factorizing a generic extension}\label{App:factorize}
+
+We show Lemma \ref{lem:general-factorize} here 
+
+\begin{lemma}[Lemma 15.43 in Jech]\label{lem:general-factorize}
+    If $G$ is generic over $\bbP$, and $N$ is a model of ZFC s.t. $M\subseteq N\subseteq M[G]$, then there is $\bbQ_1$ s.t. $N = M[H]$ for some $H$ generic over $\bbQ_1$, and $\bbQ_2\in M[H]$ and $K$ generic over $M[H]$ s.t. $\bbQ_1 *\dot{\bbQ_2} = \bbP$ and $H*K = G$. This entails that $M[H][K] = M[G]$.
+\end{lemma}
+
+We use the boolean algebraic approach to prove the statement.
+
+
+\begin{lemma}[Lemma 15.43 in Jech]\label{lem:boolean-generate}
+    For a complete boolean algebra $\mathcal{B}$ s.t. for a set $X\subseteq \mathcal{B}$, $\mathcal{B}$ is the smallest complete subalgebra that contains $X$ (In $M[G]$). Then for each generic $G$ on $\mathcal{B}$, $M[G] = M[X\cap G]$.
+\end{lemma}
+
+\begin{proof}
+    If suffice to show that $G\in M[X\cap G]$. Now since $\mathcal{B}$ is the smallest complete subalgebra that contains $X$, we set $$X_0 = X,  \overline{X_\alpha} = \{\neg a\mid a\in X_\alpha\}, X_\alpha = \{\bigvee Z\mid Z\subseteq \bigcup_{\beta<\alpha}(X_\beta\cup \overline{X_\beta})\}$$
+    and we would have $\bigcup_{\alpha<\theta}X_\alpha$ for some, say $\theta = |\mathcal{B}|$. 
+
+    Then $G$ is in $M[X\cap G]$, we let $$G_0 = G\cap X, \overline{G_\alpha} = \{\neg a\mid a\in X_\alpha - G_\alpha\}, G_\alpha = \{\bigvee Z\mid Z\cap \bigcup_{\beta<\alpha}(G_\beta\cup \overline{G_\beta})\neq \emptyset, Z\subseteq \bigcup_{\beta<\alpha}(X_\beta\cup \overline{X_\beta})\}$$
+    Then $G = \bigcup_{\alpha<\theta}G_\alpha$  since we can show $G_\alpha = G\cap X_\alpha, \overline{G_\alpha} = G\cap \overline{X_\alpha}$ by an induction.
+\end{proof}
+
+We say a complete boolean algebra is $\kappa$-generated if there is some $X\subseteq \mathcal{B}$ of size at most $\kappa$ s.t. $\mathcal{B}$ is the smallest complete subalgebra that contains $X$.
+
+The following observation is interesting, it shows that a generic extension for $\kappa$-generated boolean algebra is determined by some set of ordinal.
+
+\begin{corollary}[Corollary 15.41]
+    If $\mathcal{B}$ is $\kappa$-generated, then $M[G] = M[A]$ for some $A\subseteq \kappa$.
+\end{corollary}
+
+\begin{proof}
+    
+\end{proof}
+
+\begin{corollary}[Corollary 15.42 in Jech]
+    If $G$ is generic over $\mathcal{B}$ and $A\in M[G]$ is a subset of $\kappa$, then there is a $\kappa$ generated complete subalgebra $D$ of $B$ (in $M[G]$), s.t. $M[D\cap G] = M[A]$.
+\end{corollary}
+
+\begin{proof}
+    Let $\dot{A}$ be a name of $A$, and $X = \{u_\alpha\mid \alpha<\kappa\}$, here $u_\alpha = ||\check{\alpha}\in A||$ (the greatest condition that forces $\check{\alpha}\in A$). Working in $M[G]$, let $D$ be the complete subalgebra completely generated by $X$, then by Lemma \ref{lem:boolean-generate}, $M[X\cap G] = M[D\cap G]$.
+
+    But since $A = \{\alpha\mid u_\alpha\in X\cap G\}$, $X\cap G = \{u_\alpha\mid \alpha\in A\}$, $M[A] = M[X\cap G]$.
+\end{proof}
+
+The following fatorization follows from the observation that in a sense, a generic extension is determined by the set of ordinals it has.
+
+\begin{lemma}
+    Let $G$ be generic $\mathcal{B}$, if $N$ is a model of $ZFC$ s.t. $M\subseteq N\subseteq M[G] $, then there is complete $\mathcal{D}\subseteq \mathcal{B}$ s.t. $N = M[D\cap G]$.
+\end{lemma}
+
+\begin{proof}
+    By the above corollary, it suffice to show that $N = M[A]$ for some set of ordinals. Consider $Z = \mathcal{P}(\mathcal{B})\cap M\in M$, as $M$ satisfies $AC$ there is a set of ordinals $A\in N$ that well orders $Z$, hence $Z\in M[A]$. Now the proof is complete if we show $N = M[A]$, $\supseteq$ is by minimality argument. If $X\in N$, pick a set of ordinals $A_X$ that well orders $X$, hence there is a complete subalgebra $\mathcal{D}\subseteq \mathcal{B}$ s.t. $M[A_X] = M[\mathcal{D}\cap G]$, hence $\mathcal{D}\cap G\in N$. Hence $\mathcal{D}\cap G\in Z $ and as $Z\in M[A]$, $\mathcal{D}\cap G\in M[A]$. This shows $M[A_X]\subseteq M[A]$ and thus $X\in M[A]$.
+\end{proof}
+
+\textcolor{red}{I'm not sure of the transition from boolean algebra to poset here. Is the following reasoning correct?}
+
+This completes the proof of Lemma \ref{lem:general-factorize}. For $G$ generic over $\bbP$, we take the completion $C(\bbP)$ of $\bbP$ and the corresponding generic filter $G'$ in $C(\bbP)$. Then $N = M[G'\cap \mathcal{D}]$ for some complete subalgebra $\mathcal{D}\subseteq C(\bbP)$. Consider the following congruence relation $a \equiv b$ iff $a\land d = b\land d$ for all $d\in \mathcal{D}$, it is easily checked that this is indeed a congruence relation that preserves infinite meet and join. Hence $C(\bbP)/\equiv$ can be seen as a complete subalgebra of $C(\bbP)$. Moreover, notice as a poset $\mathcal{B}$ densely embedds into $(C(\bbP)/\equiv)\times \mathcal{D}$ by $a\mapsto ([a],0)$ and hence $(C(\bbP)/\equiv)\times \mathcal{D}$ and $C(\bbP)$ is foricng equivalent, let $\bbQ_1$ be $i^{-1}[\mathcal{D}]$ and we are done. 
+
+
+\bibliographystyle{acm}
+\bibliography{bib}
+
+
+\end{document}
